@@ -1,0 +1,65 @@
+/* Background particle canvas mask */
+#background-particles {
+  mask-image: radial-gradient(
+    ellipse at center,
+    black 35%,
+    rgba(0, 0, 0, 0.8) 65%,
+    transparent 100%
+  );
+}
+
+/* Custom cursor spotlight */
+.cursor-light {
+  transition: opacity 200ms ease;
+}
+
+.cursor-light::before {
+  content: "";
+  position: absolute;
+  top: -150px;
+  left: -150px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 46, 147, 0.12) 0%,
+    rgba(255, 46, 147, 0.045) 35%,
+    transparent 72%
+  );
+}
+
+.cursor-light::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF8BC2;
+  box-shadow:
+    0 0 6px #FF8BC2,
+    0 0 14px #FF2E93,
+    0 0 30px rgba(255, 46, 147, 0.9);
+}
+
+/* Scroll indicator animation */
+@keyframes scroll-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scaleX(0.6);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* Disable custom cursor on touch devices */
+@media (hover: none), (pointer: coarse), (max-width: 700px) {
+  .cursor-light {
+    display: none;
+  }
+}

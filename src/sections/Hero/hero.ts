@@ -45,6 +45,7 @@ export function initHero(
   let titleHeight = 0;
 
   let animationFrame = 0;
+  let disposed = false;
 
   const pointer = {
     heroX: -1000,
@@ -83,7 +84,12 @@ export function initHero(
     backgroundCanvas.height = Math.floor(height * pixelRatio);
 
     backgroundCtx!.setTransform(
-      pixelRatio, 0, 0, pixelRatio, 0, 0
+      pixelRatio,
+      0,
+      0,
+      pixelRatio,
+      0,
+      0
     );
 
     backgroundDots = [];
@@ -122,14 +128,22 @@ export function initHero(
     canvas.height = Math.floor(titleHeight * pixelRatio);
 
     ctx!.setTransform(
-      pixelRatio, 0, 0, pixelRatio, 0, 0
+      pixelRatio,
+      0,
+      0,
+      pixelRatio,
+      0,
+      0
     );
 
     offscreen.width = Math.max(1, Math.floor(titleWidth));
     offscreen.height = Math.max(1, Math.floor(titleHeight));
 
     offCtx!.clearRect(
-      0, 0, offscreen.width, offscreen.height
+      0,
+      0,
+      offscreen.width,
+      offscreen.height
     );
 
     let fontSize = titleHeight * 0.75;
@@ -157,7 +171,10 @@ export function initHero(
     );
 
     const imageData = offCtx!.getImageData(
-      0, 0, offscreen.width, offscreen.height
+      0,
+      0,
+      offscreen.width,
+      offscreen.height
     );
 
     particles = [];
@@ -244,8 +261,7 @@ export function initHero(
         Math.PI * 2
       );
 
-      backgroundCtx!.fillStyle =
-        `rgba(255, 100, 175, ${opacity})`;
+      backgroundCtx!.fillStyle = `rgba(255, 100, 175, ${opacity})`;
 
       backgroundCtx!.fill();
     }
@@ -267,7 +283,13 @@ export function initHero(
       gradient.addColorStop(1, "rgba(255, 46, 147, 0)");
 
       backgroundCtx!.fillStyle = gradient;
-      backgroundCtx!.fillRect(0, 0, width, height);
+
+      backgroundCtx!.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
     }
   }
 
@@ -327,6 +349,8 @@ export function initHero(
   // MAIN ANIMATION
 
   function animate() {
+    if (disposed) return;
+
     drawBackgroundParticles();
     drawTitleParticles();
 
@@ -369,6 +393,8 @@ export function initHero(
   // RESIZE
 
   function handleResize() {
+    if (disposed) return;
+
     cancelAnimationFrame(animationFrame);
 
     createBackgroundParticles();
@@ -381,6 +407,8 @@ export function initHero(
 
   async function start() {
     await document.fonts.ready;
+
+    if (disposed) return;
 
     createBackgroundParticles();
     createTitleParticles();
@@ -398,11 +426,15 @@ export function initHero(
   // CLEANUP FOR REACT
 
   return () => {
+    disposed = true;
+
     cancelAnimationFrame(animationFrame);
 
     hero.removeEventListener("pointermove", handlePointerMove);
     hero.removeEventListener("pointerleave", handlePointerLeave);
 
     window.removeEventListener("resize", handleResize);
+
+    cursorLight.style.opacity = "0";
   };
 }
