@@ -1,8 +1,7 @@
 export function initHero(
   hero: HTMLElement,
   canvas: HTMLCanvasElement,
-  backgroundCanvas: HTMLCanvasElement,
-  cursorLight: HTMLDivElement
+  backgroundCanvas: HTMLCanvasElement
 ) {
   const ctx = canvas.getContext("2d");
   const backgroundCtx = backgroundCanvas.getContext("2d");
@@ -48,9 +47,6 @@ export function initHero(
   let disposed = false;
 
   const pointer = {
-    heroX: -1000,
-    heroY: -1000,
-
     titleX: -1000,
     titleY: -1000,
 
@@ -266,7 +262,7 @@ export function initHero(
       backgroundCtx!.fill();
     }
 
-    // PINK SPOTLIGHT
+    // PINK SPOTLIGHT ON BACKGROUND PARTICLES
 
     if (pointer.active) {
       const gradient = backgroundCtx!.createRadialGradient(
@@ -357,17 +353,13 @@ export function initHero(
     animationFrame = requestAnimationFrame(animate);
   }
 
-  // CURSOR MOVEMENT
+  // PARTICLE INTERACTION WITH MOUSE
 
   function handlePointerMove(event: PointerEvent) {
     if (event.pointerType === "touch") return;
 
-    const heroRect = hero.getBoundingClientRect();
     const canvasRect = canvas.getBoundingClientRect();
     const backgroundRect = backgroundCanvas.getBoundingClientRect();
-
-    pointer.heroX = event.clientX - heroRect.left;
-    pointer.heroY = event.clientY - heroRect.top;
 
     pointer.backgroundX =
       event.clientX - backgroundRect.left;
@@ -379,15 +371,10 @@ export function initHero(
     pointer.titleY = event.clientY - canvasRect.top;
 
     pointer.active = true;
-
-    cursorLight.style.left = `${pointer.heroX}px`;
-    cursorLight.style.top = `${pointer.heroY}px`;
-    cursorLight.style.opacity = "1";
   }
 
   function handlePointerLeave() {
     pointer.active = false;
-    cursorLight.style.opacity = "0";
   }
 
   // RESIZE
@@ -434,7 +421,5 @@ export function initHero(
     hero.removeEventListener("pointerleave", handlePointerLeave);
 
     window.removeEventListener("resize", handleResize);
-
-    cursorLight.style.opacity = "0";
   };
 }
