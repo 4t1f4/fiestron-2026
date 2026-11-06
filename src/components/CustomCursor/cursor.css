@@ -1,0 +1,78 @@
+/* GLOBAL CUSTOM CURSOR */
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+
+  width: 8px;
+  height: 8px;
+
+  pointer-events: none;
+  opacity: 0;
+
+  transition: opacity 200ms ease;
+  will-change: transform;
+}
+
+/* PINK RADIAL SPOTLIGHT */
+
+.custom-cursor::before {
+  content: "";
+
+  position: absolute;
+  top: -150px;
+  left: -150px;
+
+  width: 300px;
+  height: 300px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 46, 147, 0.12) 0%,
+    rgba(255, 46, 147, 0.045) 35%,
+    transparent 72%
+  );
+}
+
+/* GLOWING PINK DOT */
+
+.custom-cursor::after {
+  content: "";
+
+  position: absolute;
+  top: -4px;
+  left: -4px;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #FF8BC2;
+
+  box-shadow:
+    0 0 6px #FF8BC2,
+    0 0 14px #FF2E93,
+    0 0 30px rgba(255, 46, 147, 0.9);
+}
+
+/* HIDE NATIVE CURSOR GLOBALLY */
+
+@media (hover: hover) and (pointer: fine) {
+  html.custom-cursor-active,
+  html.custom-cursor-active * {
+    cursor: none !important;
+  }
+}
+
+/* TOUCH DEVICES */
+
+@media (hover: none), (pointer: coarse) {
+  .custom-cursor {
+    display: none;
+  }
+}
