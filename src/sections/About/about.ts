@@ -16,7 +16,11 @@ export function initAbout(
     y: number;
     size: number;
     alpha: number;
+    baseAlpha: number;
     speed: number;
+    drift: number;
+    phase: number;
+    twinkleSpeed: number;
   };
 
   let stars: Star[] = [];
@@ -37,24 +41,41 @@ export function initAbout(
     canvas.width = Math.floor(width * pixelRatio);
     canvas.height = Math.floor(height * pixelRatio);
 
-    ctx!.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    ctx!.setTransform(
+      pixelRatio,
+      0,
+      0,
+      pixelRatio,
+      0,
+      0
+    );
 
     stars = [];
 
-    const count = Math.floor((width * height) / 12000);
+    const count = Math.floor((width * height) / 5500);
 
     for (let i = 0; i < count; i++) {
+      const baseAlpha = Math.random() * 0.5 + 0.3;
+
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 1.2 + 0.4,
-        alpha: Math.random() * 0.7 + 0.2,
-        speed: Math.random() * 0.15 + 0.05,
+
+        size: Math.random() * 1.8 + 0.9,
+
+        alpha: baseAlpha,
+        baseAlpha,
+
+        speed: Math.random() * 0.8 + 0.5,
+        drift: Math.random() * 0.8 - 0.4,
+
+        phase: Math.random() * Math.PI * 2,
+        twinkleSpeed: Math.random() * 0.04 + 0.015,
       });
     }
   }
 
-  // STAR ANIMATION
+  // CONTINUOUS STAR ANIMATION
 
   function animate() {
     if (disposed) return;
@@ -62,11 +83,39 @@ export function initAbout(
     ctx!.clearRect(0, 0, width, height);
 
     for (const star of stars) {
+
+      // FLOAT UPWARDS
+
       star.y -= star.speed;
 
-      if (star.y < 0) {
-        star.y = height;
+      // SIDEWAYS DRIFT
+
+      star.phase += star.twinkleSpeed;
+
+      star.x += star.drift + Math.sin(star.phase) * 0.15;
+
+      // LOOP BACK WHEN OUT OF BOUNDS
+
+      if (star.y < -5) {
+        star.y = height + 5;
+        star.x = Math.random() * width;
       }
+
+      if (star.x < -5) {
+        star.x = width + 5;
+      }
+
+      if (star.x > width + 5) {
+        star.x = -5;
+      }
+
+      // TWINKLING
+
+      star.alpha =
+        star.baseAlpha *
+        (0.35 + (Math.sin(star.phase) + 1) * 0.325);
+
+      // DRAW PARTICLE
 
       ctx!.beginPath();
 
@@ -79,8 +128,14 @@ export function initAbout(
       );
 
       ctx!.fillStyle = `rgba(255, 139, 194, ${star.alpha})`;
+
+      ctx!.shadowBlur = star.size > 2 ? 10 : 5;
+      ctx!.shadowColor = "#FF2E93";
+
       ctx!.fill();
     }
+
+    ctx!.shadowBlur = 0;
 
     animationFrame = requestAnimationFrame(animate);
   }
