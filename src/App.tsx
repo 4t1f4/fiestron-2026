@@ -1,5 +1,6 @@
 import { Navbar } from "./components/Navbar/Navbar";
-import Hero from "./components/Hero/Hero.tsx";
+import Hero from "./sections/Hero/Hero.tsx";
+import About from "./sections/About/About.tsx";
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
 
       <main>
         <Hero />
+        <About />
       </main>
     </div>
   );
