@@ -1,0 +1,53 @@
+/* TERMINAL LINE NUMBERS */
+
+.code-body code {
+  counter-reset: line-number;
+}
+
+.code-line {
+  display: block;
+  min-height: 1.9em;
+  counter-increment: line-number;
+}
+
+.code-line::before {
+  content: counter(line-number, decimal-leading-zero);
+  display: inline-block;
+  width: 3rem;
+  margin-right: 1.5rem;
+  color: rgba(169, 154, 165, 0.35);
+  font-size: 0.72rem;
+  text-align: right;
+  user-select: none;
+}
+
+/* MOBILE LINE NUMBERS */
+
+@media (max-width: 768px) {
+  .code-line::before {
+    width: 2rem;
+    margin-right: 0.8rem;
+    font-size: 0.65rem;
+  }
+}
+
+/* BLINKING TERMINAL CURSOR */
+
+.token-cursor {
+  display: inline-block;
+  color: #FF2E93;
+  margin-left: 2px;
+  animation: blink 0.8s step-start infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .token-cursor {
+    animation: none;
+  }
+}
