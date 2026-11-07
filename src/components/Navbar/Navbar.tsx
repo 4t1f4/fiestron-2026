@@ -1,33 +1,112 @@
-import React from 'react';
+import { useEffect, useState } from "react";
+import "./navbar.css";
 
-export const Navbar: React.FC = () => {
+const navItems = [
+  { label: "HOME", href: "#home", id: "home" },
+  { label: "ABOUT", href: "#about", id: "about" },
+  { label: "INCHARGES", href: "/incharges", id: "incharges" },
+  { label: "TEAMS", href: "/teams", id: "teams" },
+  { label: "EVENTS", href: "#events", id: "events" },
+  { label: "SPONSORS", href: "#sponsors", id: "sponsors" },
+  { label: "CONTACT", href: "#contact", id: "contact" },
+];
+
+export default function Navbar() {
+  const [activeSection, setActiveSection] = useState("home");
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const currentPath = window.location.pathname;
+
+  useEffect(() => {
+    if (currentPath !== "/") return;
+
+    const sections = navItems
+      .filter((item) => item.href.startsWith("#"))
+      .map((item) => document.getElementById(item.id))
+      .filter((section): section is HTMLElement => section !== null);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleSections = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.intersectionRatio - a.intersectionRatio
+          );
+
+        if (visibleSections.length > 0) {
+          setActiveSection(visibleSections[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-20% 0px -60% 0px",
+        threshold: [0, 0.2, 0.4, 0.6],
+      }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [currentPath]);
+
+  function handleNavigation(id: string) {
+    setMenuOpen(false);
+
+    if (id === "incharges" || id === "teams") {
+      setActiveSection(id);
+      return;
+    }
+
+    setActiveSection(id);
+  }
+
   return (
-    <header className="fixed top-5 left-0 w-full flex justify-center z-50 px-5">
-      <nav className="flex items-center justify-between w-full max-w-5xl px-7 py-3 bg-[#180710]/75 backdrop-blur-md border border-[#FF2E93]/20 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
-        <a href="#top" className="font-['Orbitron'] font-bold text-lg tracking-[0.2em] text-white hover:text-[#FF2E93] transition-colors duration-300 drop-shadow-[0_0_10px_rgba(255,46,147,0.5)]">
-          FIESTRON
-        </a>
+    <header className="navbar">
+      <a
+        href="/#home"
+        className="navbar-logo"
+        onClick={() => handleNavigation("home")}
+      >
+        FIESTRON<span>2026</span>
+      </a>
 
-        <ul className="hidden md:flex items-center space-x-8">
-          {['ABOUT', 'EVENTS', 'TIMELINE', 'GALLERY', 'CONTACT'].map((item) => (
-            <li key={item}>
-              <a
-                href={`#${item.toLowerCase()}`}
-                className="text-xs font-medium tracking-[0.2em] text-[#A99AA5] hover:text-[#FF2E93] hover:drop-shadow-[0_0_8px_rgba(255,46,147,0.6)] transition-all duration-300"
-              >
-                {item}
-              </a>
-            </li>
-          ))}
-        </ul>
+      <button
+        className={`navbar-toggle ${menuOpen ? "open" : ""}`}
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle navigation"
+        aria-expanded={menuOpen}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
 
-        <a
-          href="#register"
-          className="text-xs font-semibold tracking-[0.2em] text-[#080609] bg-[#FF2E93] px-6 py-2.5 rounded-full hover:bg-white hover:shadow-[0_0_25px_rgba(255,46,147,0.8)] transition-all duration-300 shadow-[0_0_15px_rgba(255,46,147,0.4)]"
-        >
-          REGISTER
-        </a>
+      <nav className={`navbar-links ${menuOpen ? "show" : ""}`}>
+        {navItems.map((item) => {
+          const isActive =
+            activeSection === item.id ||
+            (item.id === "incharges" &&
+              currentPath === "/incharges") ||
+            (item.id === "teams" &&
+              currentPath === "/teams");
+
+          const href =
+            item.href.startsWith("#") && currentPath !== "/"
+              ? `/${item.href}`
+              : item.href;
+
+          return (
+            <a
+              key={item.id}
+              href={href}
+              className={`navbar-link ${isActive ? "active" : ""}`}
+              onClick={() => handleNavigation(item.id)}
+            >
+              {item.label}
+            </a>
+          );
+        })}
       </nav>
     </header>
   );
-};
+}
