@@ -1,26 +1,93 @@
-/* Background particle canvas mask */
+/* BACKGROUND PARTICLE CANVAS */
+
 #background-particles {
   mask-image: radial-gradient(
     ellipse at center,
-    black 35%,
-    rgba(0, 0, 0, 0.8) 65%,
+    black 30%,
+    rgba(0, 0, 0, 0.9) 55%,
+    rgba(0, 0, 0, 0.5) 78%,
+    transparent 100%
+  );
+
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    black 30%,
+    rgba(0, 0, 0, 0.9) 55%,
+    rgba(0, 0, 0, 0.5) 78%,
     transparent 100%
   );
 }
 
-/* Custom cursor spotlight */
+/* TITLE CONTAINER */
+
+.title-container {
+  position: relative;
+  width: 85%;
+  max-width: 750px;
+  margin: 0.5rem auto 1rem auto;
+  height: clamp(55px, 8vw, 95px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* HERO BUTTON */
+
+.hero-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  padding: 0.75rem 1.6rem;
+
+  background: rgba(255, 46, 147, 0.08);
+  border: 1px solid rgba(255, 46, 147, 0.4);
+  border-radius: 4px;
+
+  color: #F5F0F5;
+
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+
+  text-decoration: none;
+
+  transition: all 0.3s ease;
+}
+
+.hero-button:hover {
+  background: rgba(255, 46, 147, 0.18);
+  border-color: rgba(255, 46, 147, 0.8);
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 0 20px rgba(255, 46, 147, 0.3);
+}
+
+/* CUSTOM CURSOR SPOTLIGHT */
+
 .cursor-light {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 10;
   transition: opacity 200ms ease;
 }
 
 .cursor-light::before {
   content: "";
+
   position: absolute;
   top: -150px;
   left: -150px;
+
   width: 300px;
   height: 300px;
+
   border-radius: 50%;
+
   background: radial-gradient(
     circle,
     rgba(255, 46, 147, 0.12) 0%,
@@ -31,20 +98,26 @@
 
 .cursor-light::after {
   content: "";
+
   position: absolute;
   top: -4px;
   left: -4px;
+
   width: 8px;
   height: 8px;
+
   border-radius: 50%;
+
   background: #FF8BC2;
+
   box-shadow:
     0 0 6px #FF8BC2,
     0 0 14px #FF2E93,
     0 0 30px rgba(255, 46, 147, 0.9);
 }
 
-/* Scroll indicator animation */
+/* SCROLL INDICATOR */
+
 @keyframes scroll-pulse {
   0%, 100% {
     opacity: 0.3;
@@ -57,7 +130,8 @@
   }
 }
 
-/* Disable custom cursor on touch devices */
+/* MOBILE */
+
 @media (hover: none), (pointer: coarse), (max-width: 700px) {
   .cursor-light {
     display: none;

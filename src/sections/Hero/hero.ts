@@ -3,15 +3,20 @@ export function initHero(
   canvas: HTMLCanvasElement,
   backgroundCanvas: HTMLCanvasElement
 ) {
-  const ctx = canvas.getContext("2d");
-  const backgroundCtx = backgroundCanvas.getContext("2d");
+  const canvasContext = canvas.getContext("2d");
+  const backgroundContext = backgroundCanvas.getContext("2d");
 
-  if (!ctx || !backgroundCtx) return;
+  if (!canvasContext || !backgroundContext) return;
+
+  const ctx: CanvasRenderingContext2D = canvasContext;
+  const backgroundCtx: CanvasRenderingContext2D = backgroundContext;
 
   const offscreen = document.createElement("canvas");
-  const offCtx = offscreen.getContext("2d");
+  const offscreenContext = offscreen.getContext("2d");
 
-  if (!offCtx) return;
+  if (!offscreenContext) return;
+
+  const offCtx: CanvasRenderingContext2D = offscreenContext;
 
   type Particle = {
     x: number;
@@ -39,20 +44,20 @@ export function initHero(
 
   let width = 0;
   let height = 0;
-
   let titleWidth = 0;
   let titleHeight = 0;
 
   let animationFrame = 0;
   let disposed = false;
+  let started = false;
+
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
 
   const pointer = {
     titleX: -1000,
     titleY: -1000,
-
     backgroundX: -1000,
     backgroundY: -1000,
-
     active: false,
   };
 
@@ -63,7 +68,7 @@ export function initHero(
     "#9D4EDD",
   ];
 
-  // BACKGROUND PARTICLES
+  // BACKGROUND PARTICLES (DENSE GRID WITH NO SCATTERING)
 
   function createBackgroundParticles() {
     const rect = backgroundCanvas.getBoundingClientRect();
@@ -71,15 +76,10 @@ export function initHero(
     width = rect.width;
     height = rect.height;
 
-    const pixelRatio = Math.min(
-      window.devicePixelRatio || 1,
-      2
-    );
-
     backgroundCanvas.width = Math.floor(width * pixelRatio);
     backgroundCanvas.height = Math.floor(height * pixelRatio);
 
-    backgroundCtx!.setTransform(
+    backgroundCtx.setTransform(
       pixelRatio,
       0,
       0,
@@ -90,7 +90,8 @@ export function initHero(
 
     backgroundDots = [];
 
-    const spacing = width < 600 ? 25 : 32;
+    // Compact and dense spacing for clean matrix look
+    const spacing = width < 600 ? 12 : 14;
 
     for (let y = spacing / 2; y < height; y += spacing) {
       for (let x = spacing / 2; x < width; x += spacing) {
@@ -101,13 +102,13 @@ export function initHero(
           homeY: y,
           vx: 0,
           vy: 0,
-          radius: Math.random() * 0.8 + 0.7,
+          radius: Math.random() * 0.3 + 0.6,
         });
       }
     }
   }
 
-  // FIESTRON PARTICLE TYPOGRAPHY
+  // FIESTRON TITLE PARTICLES
 
   function createTitleParticles() {
     const rect = canvas.getBoundingClientRect();
@@ -115,15 +116,10 @@ export function initHero(
     titleWidth = rect.width;
     titleHeight = rect.height;
 
-    const pixelRatio = Math.min(
-      window.devicePixelRatio || 1,
-      2
-    );
-
     canvas.width = Math.floor(titleWidth * pixelRatio);
     canvas.height = Math.floor(titleHeight * pixelRatio);
 
-    ctx!.setTransform(
+    ctx.setTransform(
       pixelRatio,
       0,
       0,
@@ -135,38 +131,33 @@ export function initHero(
     offscreen.width = Math.max(1, Math.floor(titleWidth));
     offscreen.height = Math.max(1, Math.floor(titleHeight));
 
-    offCtx!.clearRect(
-      0,
-      0,
-      offscreen.width,
-      offscreen.height
-    );
+    offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
 
-    let fontSize = titleHeight * 0.75;
+    let fontSize = titleHeight * 0.48;
 
-    offCtx!.direction = "ltr";
-    offCtx!.textAlign = "center";
-    offCtx!.textBaseline = "middle";
+    offCtx.direction = "ltr";
+    offCtx.textAlign = "center";
+    offCtx.textBaseline = "middle";
 
-    offCtx!.font = `900 ${fontSize}px Orbitron, sans-serif`;
+    offCtx.font = `900 ${fontSize}px Orbitron, sans-serif`;
 
-    const textWidth = offCtx!.measureText("FIESTRON").width;
-    const maximumWidth = titleWidth * 0.88;
+    const textWidth = offCtx.measureText("FIESTRON").width;
+    const maximumWidth = titleWidth * 0.75;
 
     if (textWidth > maximumWidth) {
       fontSize *= maximumWidth / textWidth;
     }
 
-    offCtx!.font = `900 ${fontSize}px Orbitron, sans-serif`;
-    offCtx!.fillStyle = "#FFFFFF";
+    offCtx.font = `900 ${fontSize}px Orbitron, sans-serif`;
+    offCtx.fillStyle = "#FFFFFF";
 
-    offCtx!.fillText(
+    offCtx.fillText(
       "FIESTRON",
       titleWidth / 2,
       titleHeight / 2
     );
 
-    const imageData = offCtx!.getImageData(
+    const imageData = offCtx.getImageData(
       0,
       0,
       offscreen.width,
@@ -201,71 +192,13 @@ export function initHero(
     }
   }
 
-  // DRAW BACKGROUND PARTICLES
+  // DRAW BACKGROUND PARTICLES WITH CORNER VIGNETTE FADE
 
   function drawBackgroundParticles() {
-    backgroundCtx!.clearRect(0, 0, width, height);
-
-    for (const dot of backgroundDots) {
-      if (pointer.active) {
-        const dx = dot.x - pointer.backgroundX;
-        const dy = dot.y - pointer.backgroundY;
-
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const forceRadius = 175;
-
-        if (distance < forceRadius && distance > 0) {
-          const force = (1 - distance / forceRadius) * 1.7;
-
-          dot.vx += (dx / distance) * force;
-          dot.vy += (dy / distance) * force;
-        }
-      }
-
-      dot.vx += (dot.homeX - dot.x) * 0.025;
-      dot.vy += (dot.homeY - dot.y) * 0.025;
-
-      dot.vx *= 0.88;
-      dot.vy *= 0.88;
-
-      dot.x += dot.vx;
-      dot.y += dot.vy;
-
-      let opacity = 0.25;
-
-      if (pointer.active) {
-        const dx = dot.x - pointer.backgroundX;
-        const dy = dot.y - pointer.backgroundY;
-
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 220) {
-          opacity = Math.max(
-            opacity,
-            0.8 * (1 - distance / 220)
-          );
-        }
-      }
-
-      backgroundCtx!.beginPath();
-
-      backgroundCtx!.arc(
-        dot.x,
-        dot.y,
-        dot.radius,
-        0,
-        Math.PI * 2
-      );
-
-      backgroundCtx!.fillStyle = `rgba(255, 100, 175, ${opacity})`;
-
-      backgroundCtx!.fill();
-    }
-
-    // PINK SPOTLIGHT ON BACKGROUND PARTICLES
+    backgroundCtx.clearRect(0, 0, width, height);
 
     if (pointer.active) {
-      const gradient = backgroundCtx!.createRadialGradient(
+      const gradient = backgroundCtx.createRadialGradient(
         pointer.backgroundX,
         pointer.backgroundY,
         0,
@@ -278,71 +211,170 @@ export function initHero(
       gradient.addColorStop(0.5, "rgba(157, 78, 221, 0.025)");
       gradient.addColorStop(1, "rgba(255, 46, 147, 0)");
 
-      backgroundCtx!.fillStyle = gradient;
+      backgroundCtx.fillStyle = gradient;
+      backgroundCtx.fillRect(0, 0, width, height);
+    }
 
-      backgroundCtx!.fillRect(
-        0,
-        0,
-        width,
-        height
+    const opacityGroups: Path2D[] = Array.from(
+      { length: 9 },
+      () => new Path2D()
+    );
+
+    for (const dot of backgroundDots) {
+      if (pointer.active) {
+        const dx = dot.x - pointer.backgroundX;
+        const dy = dot.y - pointer.backgroundY;
+
+        const distanceSquared = dx * dx + dy * dy;
+        const forceRadius = 200;
+
+        if (distanceSquared < forceRadius * forceRadius) {
+          const distance = Math.sqrt(distanceSquared);
+
+          if (distance > 0) {
+            const force = (1 - distance / forceRadius) * 2.8;
+
+            dot.vx += (dx / distance) * force;
+            dot.vy += (dy / distance) * force;
+          }
+        }
+      }
+
+      dot.vx += (dot.homeX - dot.x) * 0.05;
+      dot.vy += (dot.homeY - dot.y) * 0.05;
+
+      dot.vx *= 0.80;
+      dot.vy *= 0.80;
+
+      dot.x += dot.vx;
+      dot.y += dot.vy;
+
+      // Calculate distance from center to fade dots out smoothly at the edges/corners
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const distanceFromCenter = Math.hypot(dot.x - centerX, dot.y - centerY);
+      const maxRadius = Math.hypot(centerX, centerY) * 0.88;
+      
+      let edgeFade = 1;
+      if (distanceFromCenter > maxRadius * 0.5) {
+        edgeFade = Math.max(0, 1 - (distanceFromCenter - maxRadius * 0.5) / (maxRadius * 0.5));
+      }
+
+      let opacity = 0.28 * edgeFade;
+
+      if (pointer.active) {
+        const dx = dot.x - pointer.backgroundX;
+        const dy = dot.y - pointer.backgroundY;
+        const distanceSquared = dx * dx + dy * dy;
+
+        if (distanceSquared < 200 * 200) {
+          const distance = Math.sqrt(distanceSquared);
+          opacity = Math.max(
+            opacity,
+            (0.7 * (1 - distance / 200)) * edgeFade
+          );
+        }
+      }
+
+      const group = Math.min(
+        8,
+        Math.floor(opacity * 12)
       );
+
+      opacityGroups[group].moveTo(
+        dot.x + dot.radius,
+        dot.y
+      );
+
+      opacityGroups[group].arc(
+        dot.x,
+        dot.y,
+        dot.radius,
+        0,
+        Math.PI * 2
+      );
+    }
+
+    for (let i = 0; i < opacityGroups.length; i++) {
+      backgroundCtx.fillStyle =
+        `rgba(255, 100, 175, ${i / 11})`;
+
+      backgroundCtx.fill(opacityGroups[i]);
     }
   }
 
   // DRAW TITLE PARTICLES
 
   function drawTitleParticles() {
-    ctx!.clearRect(0, 0, titleWidth, titleHeight);
+    ctx.clearRect(0, 0, titleWidth, titleHeight);
+
+    const colorPaths = new Map<string, Path2D>();
+
+    for (const color of titleColors) {
+      colorPaths.set(color, new Path2D());
+    }
 
     for (const particle of particles) {
       if (pointer.active) {
         const dx = particle.x - pointer.titleX;
         const dy = particle.y - pointer.titleY;
 
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const forceRadius = 145;
+        const distanceSquared = dx * dx + dy * dy;
+        const forceRadius = 190;
 
-        if (distance < forceRadius && distance > 0) {
-          const force = (1 - distance / forceRadius) * 1.8;
+        if (distanceSquared < forceRadius * forceRadius) {
+          const distance = Math.sqrt(distanceSquared);
 
-          particle.vx += (dx / distance) * force;
-          particle.vy += (dy / distance) * force;
+          if (distance > 0) {
+            const force = (1 - distance / forceRadius) * 3.5;
+
+            particle.vx += (dx / distance) * force;
+            particle.vy += (dy / distance) * force;
+          }
         }
       }
 
       particle.vx +=
-        (particle.homeX - particle.x) * 0.035;
+        (particle.homeX - particle.x) * 0.055;
 
       particle.vy +=
-        (particle.homeY - particle.y) * 0.035;
+        (particle.homeY - particle.y) * 0.055;
 
-      particle.vx *= 0.84;
-      particle.vy *= 0.84;
+      particle.vx *= 0.80;
+      particle.vy *= 0.80;
 
       particle.x += particle.vx;
       particle.y += particle.vy;
 
-      ctx!.beginPath();
+      const path = colorPaths.get(particle.color);
 
-      ctx!.arc(
-        particle.x,
-        particle.y,
-        particle.radius,
-        0,
-        Math.PI * 2
-      );
+      if (path) {
+        path.moveTo(
+          particle.x + particle.radius,
+          particle.y
+        );
 
-      ctx!.fillStyle = particle.color;
-      ctx!.shadowBlur = 5;
-      ctx!.shadowColor = particle.color;
-
-      ctx!.fill();
+        path.arc(
+          particle.x,
+          particle.y,
+          particle.radius,
+          0,
+          Math.PI * 2
+        );
+      }
     }
 
-    ctx!.shadowBlur = 0;
+    for (const color of titleColors) {
+      const path = colorPaths.get(color);
+
+      if (path) {
+        ctx.fillStyle = color;
+        ctx.fill(path);
+      }
+    }
   }
 
-  // MAIN ANIMATION
+  // ANIMATION
 
   function animate() {
     if (disposed) return;
@@ -353,7 +385,7 @@ export function initHero(
     animationFrame = requestAnimationFrame(animate);
   }
 
-  // PARTICLE INTERACTION WITH MOUSE
+  // POINTER MOVEMENT
 
   function handlePointerMove(event: PointerEvent) {
     if (event.pointerType === "touch") return;
@@ -367,8 +399,11 @@ export function initHero(
     pointer.backgroundY =
       event.clientY - backgroundRect.top;
 
-    pointer.titleX = event.clientX - canvasRect.left;
-    pointer.titleY = event.clientY - canvasRect.top;
+    pointer.titleX =
+      event.clientX - canvasRect.left;
+
+    pointer.titleY =
+      event.clientY - canvasRect.top;
 
     pointer.active = true;
   }
@@ -380,7 +415,7 @@ export function initHero(
   // RESIZE
 
   function handleResize() {
-    if (disposed) return;
+    if (disposed || !started) return;
 
     cancelAnimationFrame(animationFrame);
 
@@ -390,7 +425,7 @@ export function initHero(
     animate();
   }
 
-  // INITIALIZATION
+  // START
 
   async function start() {
     await document.fonts.ready;
@@ -399,6 +434,8 @@ export function initHero(
 
     createBackgroundParticles();
     createTitleParticles();
+
+    started = true;
 
     animate();
   }
@@ -410,7 +447,7 @@ export function initHero(
 
   start();
 
-  // CLEANUP FOR REACT
+  // CLEANUP
 
   return () => {
     disposed = true;
