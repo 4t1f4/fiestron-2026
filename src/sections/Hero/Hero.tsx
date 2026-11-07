@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import { initHero } from "./hero";
 import "./hero.css";
 
@@ -6,6 +7,9 @@ export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const titleCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [showTheme, setShowTheme] = useState(false);
+  const [pinned, setPinned] = useState(false);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -44,7 +48,7 @@ export default function Hero() {
           <canvas
             ref={backgroundCanvasRef}
             id="background-particles"
-            className="absolute inset-0 z-0 h-full w-full pointer-events-none"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full"
             aria-hidden="true"
           />
 
@@ -81,78 +85,62 @@ export default function Hero() {
                 aria-hidden="true"
               />
 
-              <h1 className="sr-only">
-                FIESTRON
-              </h1>
+              <h1 className="sr-only">FIESTRON</h1>
             </div>
-
-            {/* Theme */}
-            <p
-              className="
-                mt-2 flex flex-wrap items-center justify-center
-                gap-[0.7rem] text-[clamp(1rem,2vw,1.45rem)]
-                font-normal tracking-[0.04em] text-[#F5F0F5]
-              "
-            >
-              <span
-                className="
-                  font-['Orbitron'] text-[0.95em] font-bold
-                  tracking-[0.16em] text-[#FF2E93]
-                  drop-shadow-[0_0_18px_rgba(255,46,147,0.35)]
-                "
-              >
-                DEJA VU
-              </span>
-
-              <span className="text-[#9D4EDD]">
-                —
-              </span>
-
-              You've Been Here Before.
-            </p>
           </div>
         </div>
 
-        {/* Description */}
-        <p
-          className="
-            mt-6 max-w-[480px]
-            text-[0.95rem] font-light leading-[1.8]
-            text-[#A99AA5]
-            max-[700px]:max-w-[330px]
-            max-[700px]:text-[0.85rem]
-          "
-        >
-          A moment from the past. A glitch in the present.
-          An experience yet to come.
-        </p>
 
-        {/* CTA */}
-        <a
-          href="#about"
-          className="
-            mt-10 inline-flex items-center justify-center gap-6
-            rounded-[3px] border border-[rgba(255,46,147,0.55)]
-            bg-[rgba(255,46,147,0.04)]
-            px-6 py-4
-            text-[0.72rem] font-semibold tracking-[0.2em]
-            text-[#F5F0F5]
-            transition-all duration-300
-            hover:-translate-y-[3px]
-            hover:bg-[rgba(255,46,147,0.12)]
-            hover:shadow-[0_0_20px_rgba(255,46,147,0.15),0_0_35px_rgba(157,78,221,0.1)]
-          "
-        >
-          ENTER THE LOOP
+        {/* CTA and DEJA VU theme card */}
+        <div className="hero-cta-wrapper">
 
-          <span
-            className="text-base text-[#FF2E93]"
-            aria-hidden="true"
+          <div
+            className={`theme-card ${showTheme ? "theme-card-visible" : ""}`}
+            aria-hidden={!showTheme}
           >
-            ↗
-          </span>
-        </a>
+            <span className="theme-card-label">THE THEME</span>
 
+            <h3>DEJA VU</h3>
+
+            <p>
+              You've been here before.
+              <br />
+              Or have you?
+            </p>
+
+            <span className="theme-card-footer">
+              PAST · PRESENT · FUTURE
+            </span>
+          </div>
+
+          <a
+            href="#about"
+            className="hero-cta"
+            onMouseEnter={() => setShowTheme(true)}
+            onMouseLeave={() => {
+              if (!pinned) setShowTheme(false);
+            }}
+            onFocus={() => setShowTheme(true)}
+            onBlur={() => {
+              if (!pinned) setShowTheme(false);
+            }}
+            onClick={(e) => {
+              if (!pinned) {
+                e.preventDefault();
+                setPinned(true);
+                setShowTheme(true);
+              } else {
+                setPinned(false);
+              }
+            }}
+          >
+            <span className="hero-cta-text">ENTER THE LOOP</span>
+            <span className="hero-cta-arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+
+        </div>
       </div>
     </section>
   );
