@@ -1,12 +1,15 @@
 import { useEffect, useRef } from "react";
+
 import { initAbout } from "./about";
+
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import "./about.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Wrap every character separately for the typing animation.
+// Wrap every character separately for typing animation.
 function typed(text: string) {
   return Array.from(text).map((char, index) => (
     <span className="terminal-char" key={index}>
@@ -27,17 +30,21 @@ export default function About() {
 
     if (!section || !canvas || !terminal) return;
 
-    // Background star animation
+    // Animated WebGL background
     const cleanupCanvas = initAbout(section, canvas);
 
     const chars = terminal.querySelectorAll(".terminal-char");
     const cursor = terminal.querySelector(".token-cursor");
 
     // Hide terminal characters initially
-    gsap.set(chars, { autoAlpha: 0 });
+    gsap.set(chars, {
+      autoAlpha: 0,
+    });
 
     if (cursor) {
-      gsap.set(cursor, { autoAlpha: 0 });
+      gsap.set(cursor, {
+        autoAlpha: 0,
+      });
     }
 
     // Terminal typing animation
@@ -65,6 +72,7 @@ export default function About() {
 
     return () => {
       cleanupCanvas?.();
+
       typingTimeline.scrollTrigger?.kill();
       typingTimeline.kill();
     };
@@ -78,18 +86,23 @@ export default function About() {
         relative isolate flex min-h-screen w-full
         items-center justify-center overflow-hidden
         px-6 py-24
-        bg-[radial-gradient(circle_at_80%_20%,rgba(157,78,221,0.15),transparent_45%),radial-gradient(circle_at_20%_80%,rgba(255,46,147,0.12),transparent_50%),#080609]
+        bg-[#080609]
         font-body
         max-[768px]:px-4 max-[768px]:py-16
       "
     >
-      {/* Background Canvas */}
+      {/* Animated WebGL Background */}
       <canvas
         ref={canvasRef}
-        className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+        className="
+          about-canvas
+          pointer-events-none absolute inset-0
+          z-0 h-full w-full
+        "
         aria-hidden="true"
       />
 
+      {/* Main Content */}
       <div className="relative z-[1] flex w-full max-w-[900px] flex-col items-center text-center">
 
         {/* Header */}
@@ -256,13 +269,21 @@ export default function About() {
 
               <div className="code-line">
                 {typed("  tracks: [")}
-                <span className="text-[#00F0FF]">{typed('"Coding"')}</span>
+                <span className="text-[#00F0FF]">
+                  {typed('"Coding"')}
+                </span>
                 {typed(", ")}
-                <span className="text-[#00F0FF]">{typed('"AI"')}</span>
+                <span className="text-[#00F0FF]">
+                  {typed('"AI"')}
+                </span>
                 {typed(", ")}
-                <span className="text-[#00F0FF]">{typed('"Gaming"')}</span>
+                <span className="text-[#00F0FF]">
+                  {typed('"Gaming"')}
+                </span>
                 {typed(", ")}
-                <span className="text-[#00F0FF]">{typed('"Design"')}</span>
+                <span className="text-[#00F0FF]">
+                  {typed('"Design"')}
+                </span>
                 {typed("],")}
               </div>
 
@@ -304,6 +325,7 @@ export default function About() {
             "
           >
             REGISTER NOW
+
             <span className="text-[#FF2E93]" aria-hidden="true">
               ↗
             </span>

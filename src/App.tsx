@@ -17,8 +17,6 @@ export default function App() {
       <main>
         <Hero />
         <About />
-        <Team />
-
         <section className="relative isolate min-h-screen overflow-hidden bg-[#080609]">
 
           <TimelineBackground />
@@ -30,6 +28,9 @@ export default function App() {
           </div>
 
         </section>
+        <Team />
+
+        
 
         {/* Add remaining sections here */}
       </main>
