@@ -15,6 +15,9 @@ type Department = {
   people: Person[];
 };
 
+
+// Please verify all names, spellings, and designations before finalising.
+
 const leadership = [
   {
     title: "Visionaries",
@@ -51,6 +54,10 @@ const leadership = [
   {
     title: "Student Core Team",
     people: [
+
+      // Replace the placeholder names with the actual core members' names.
+      // Add a short description of what each member is responsible for if possible.
+      
       { name: "Core 1", role: "Core Member", emoji: "🦁" },
       { name: "Core 2", role: "Core Member", emoji: "🐯" },
       { name: "Core 3", role: "Core Member", emoji: "🦅" },
@@ -59,7 +66,13 @@ const leadership = [
   },
 ];
 
+// Update the department names, descriptions, and respective HOD details only if there are any official changes.
+
 const departments: Department[] = [
+
+  // Replace HOD 1 and HOD 2 with the respective names.
+  // Keep HOD 1 as Head and HOD 2 as Co-Head.
+
   {
     name: "Accounts",
     icon: "💰",
@@ -169,6 +182,11 @@ const departments: Department[] = [
     ],
   },
 ];
+
+
+// Please don't modify anything below this point.
+// All required content updates should be made in the data above.
+// Only make changes to the components below if absolutely necessary for card sizing or minor visual improvements.
 
 function PhotoPlaceholder({ name }: { name: string }) {
   return (
