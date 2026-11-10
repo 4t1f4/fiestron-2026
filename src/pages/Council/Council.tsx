@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { initAbout } from "../About/about";
-import "./team.css";
+import { initAbout } from "../../sections/About/about";
+import "./council.css";
 
 type Person = {
   name: string;
@@ -274,7 +274,7 @@ function DepartmentCard({ department }: { department: Department }) {
   );
 }
 
-export default function Team() {
+export default function Council() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -289,7 +289,7 @@ export default function Team() {
 
   return (
     <section
-      id="team"
+      id="council"
       ref={sectionRef}
       className="relative isolate w-full overflow-hidden bg-[radial-gradient(circle_at_80%_20%,rgba(157,78,221,0.15),transparent_45%),radial-gradient(circle_at_20%_80%,rgba(255,46,147,0.12),transparent_50%),#080609] px-6 py-24 sm:px-10"
     >
