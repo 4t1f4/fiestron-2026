@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import "./timeline-background.css";
 
 const vertexShader = `
 attribute vec2 position;
@@ -15,11 +14,9 @@ const fragmentShader = `
 precision highp float;
 
 varying vec2 vUv;
-
 uniform float uTime;
 uniform vec2 uResolution;
 
-// FIESTRON colours
 const vec3 black = vec3(0.008, 0.006, 0.009);
 const vec3 burgundy = vec3(0.12, 0.018, 0.055);
 const vec3 magenta = vec3(1.0, 0.08, 0.42);
@@ -34,7 +31,6 @@ float hash21(vec2 p) {
 float noise(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
-
   vec2 u = f * f * (3.0 - 2.0 * f);
 
   return mix(
@@ -47,7 +43,6 @@ float noise(vec2 p) {
 float fbm(vec2 p) {
   float value = 0.0;
   float amplitude = 0.5;
-
   mat2 rotation = mat2(1.6, 1.2, -1.2, 1.6);
 
   for (int i = 0; i < 4; i++) {
@@ -63,13 +58,11 @@ float ridges(vec2 p) {
   float value = 0.0;
   float amplitude = 0.5;
   float weight = 1.0;
-
   mat2 rotation = mat2(1.6, 1.2, -1.2, 1.6);
 
   for (int i = 0; i < 4; i++) {
     float n = noise(p);
     float ridge = 1.0 - abs(2.0 * n - 1.0);
-
     ridge *= ridge;
 
     value += amplitude * ridge * (0.35 + 0.65 * weight);
@@ -84,54 +77,39 @@ float ridges(vec2 p) {
 
 void main() {
   float aspect = uResolution.x / max(uResolution.y, 1.0);
-
   float t = uTime * 0.035;
 
   vec2 p = (vUv - 0.5) * vec2(aspect, 1.0) * 3.0;
 
-  // Organic domain warping
   vec2 q = vec2(
     fbm(p * 0.55 + t * vec2(0.7, 0.45)),
     fbm(p * 0.55 + vec2(4.7, 2.3) - t * vec2(0.4, 0.65))
   );
 
   vec2 warped = p + 3.4 * (q - 0.5);
-
-  // Flowing ridged formations
   float field = ridges(warped + t * vec2(0.12, -0.08));
 
-  // Slowly breathing light
   float breath = 0.5 + 0.5 * sin(uTime * 0.3);
 
-  // Only the raised folds catch light
-  float crest = smoothstep(0.38, 0.82, field);
+  float crest = smoothstep(0.42, 0.68, field);
   crest *= crest;
 
   vec3 color = black;
 
-  // Deep burgundy underneath
-  float body = smoothstep(0.12, 0.58, field);
+  float body = smoothstep(0.18, 0.48, field);
   color += burgundy * body * 0.65;
 
-  // Violet undertones
   vec3 undertone = mix(burgundy, violet, 0.35 + 0.15 * breath);
-
   color += undertone * crest * 0.65;
 
-  // Illuminated fold crests
   vec3 highlight = mix(magenta, violet, 0.35 + 0.2 * sin(field * 8.0));
-
   color += highlight * crest * (0.12 + 0.12 * breath);
 
-  // Luminance restraint
   color = 0.32 * (vec3(1.0) - exp(-color * 2.4 / 0.32));
 
-  // Dark vignette
   vec2 vignette = (vUv - 0.5) * vec2(aspect, 1.0);
-
   color *= 1.0 - 0.4 * dot(vignette, vignette);
 
-  // Subtle film grain
   float grain = hash21(
     gl_FragCoord.xy + fract(uTime * 0.31) * 149.0
   ) - 0.5;
@@ -146,30 +124,39 @@ export default function TimelineBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvasElement = canvasRef.current;
 
-    const gl = canvas.getContext("webgl", {
+    if (!canvasElement) return;
+
+    const canvas: HTMLCanvasElement = canvasElement;
+
+    const context = canvas.getContext("webgl", {
       alpha: false,
       antialias: false,
       powerPreference: "low-power",
     });
 
-    if (!gl) {
+    if (!context) {
       console.error("WebGL is not supported.");
       return;
     }
 
-    function createShader(type: number, source: string) {
-      const shader = gl!.createShader(type);
+    const gl: WebGLRenderingContext = context;
+
+    function createShader(
+      type: number,
+      source: string
+    ): WebGLShader | null {
+      const shader = gl.createShader(type);
+
       if (!shader) return null;
 
-      gl!.shaderSource(shader, source);
-      gl!.compileShader(shader);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
 
-      if (!gl!.getShaderParameter(shader, gl!.COMPILE_STATUS)) {
-        console.error(gl!.getShaderInfoLog(shader));
-        gl!.deleteShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error(gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
         return null;
       }
 
@@ -179,10 +166,19 @@ export default function TimelineBackground() {
     const vertex = createShader(gl.VERTEX_SHADER, vertexShader);
     const fragment = createShader(gl.FRAGMENT_SHADER, fragmentShader);
 
-    if (!vertex || !fragment) return;
+    if (!vertex || !fragment) {
+      if (vertex) gl.deleteShader(vertex);
+      if (fragment) gl.deleteShader(fragment);
+      return;
+    }
 
     const program = gl.createProgram();
-    if (!program) return;
+
+    if (!program) {
+      gl.deleteShader(vertex);
+      gl.deleteShader(fragment);
+      return;
+    }
 
     gl.attachShader(program, vertex);
     gl.attachShader(program, fragment);
@@ -190,6 +186,11 @@ export default function TimelineBackground() {
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       console.error(gl.getProgramInfoLog(program));
+
+      gl.deleteProgram(program);
+      gl.deleteShader(vertex);
+      gl.deleteShader(fragment);
+
       return;
     }
 
@@ -203,7 +204,13 @@ export default function TimelineBackground() {
     ]);
 
     const buffer = gl.createBuffer();
-    if (!buffer) return;
+
+    if (!buffer) {
+      gl.deleteProgram(program);
+      gl.deleteShader(vertex);
+      gl.deleteShader(fragment);
+      return;
+    }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
@@ -218,39 +225,62 @@ export default function TimelineBackground() {
 
     let animationFrame = 0;
     let startTime = performance.now();
-    let paused = false;
+    let paused = document.hidden;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
-
-    function resize() {
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
-
-      const width = Math.floor(canvas!.clientWidth * pixelRatio);
-      const height = Math.floor(canvas!.clientHeight * pixelRatio);
-
-      if (canvas!.width !== width || canvas!.height !== height) {
-        canvas!.width = width;
-        canvas!.height = height;
-      }
-
-      gl!.viewport(0, 0, width, height);
-      gl!.useProgram(program);
-      gl!.uniform2f(resolutionLocation, width, height);
-    }
 
     function render(now: number) {
       if (paused) return;
 
       const elapsed = (now - startTime) / 1000;
 
-      gl!.useProgram(program);
-      gl!.uniform1f(timeLocation, reducedMotion.matches ? 0 : elapsed);
-
-      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
+      gl.useProgram(program);
+      gl.uniform1f(timeLocation, reducedMotion.matches ? 0 : elapsed);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
       if (!reducedMotion.matches) {
+        animationFrame = requestAnimationFrame(render);
+      }
+    }
+
+    function resize() {
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+
+      const width = Math.max(
+        1,
+        Math.floor(canvas.clientWidth * pixelRatio)
+      );
+
+      const height = Math.max(
+        1,
+        Math.floor(canvas.clientHeight * pixelRatio)
+      );
+
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+
+      gl.viewport(0, 0, width, height);
+      gl.useProgram(program);
+      gl.uniform2f(resolutionLocation, width, height);
+
+      if (reducedMotion.matches && !paused) {
+        render(performance.now());
+      }
+    }
+
+    function startAnimation() {
+      cancelAnimationFrame(animationFrame);
+
+      if (paused) return;
+
+      if (reducedMotion.matches) {
+        render(performance.now());
+      } else {
+        startTime = performance.now();
         animationFrame = requestAnimationFrame(render);
       }
     }
@@ -258,45 +288,51 @@ export default function TimelineBackground() {
     function handleVisibility() {
       paused = document.hidden;
 
-      if (!paused && !reducedMotion.matches) {
-        startTime = performance.now();
-        animationFrame = requestAnimationFrame(render);
+      if (paused) {
+        cancelAnimationFrame(animationFrame);
+      } else {
+        startAnimation();
       }
     }
 
-    resize();
-
-    if (reducedMotion.matches) {
-      render(performance.now());
-    } else {
-      animationFrame = requestAnimationFrame(render);
+    function handleMotionChange() {
+      startAnimation();
     }
 
     const observer = new ResizeObserver(resize);
+
     observer.observe(canvas);
 
+    const section = canvas.closest(".timeline-section");
+
+    if (section) {
+      observer.observe(section);
+    }
+
+    resize();
+    startAnimation();
+
     document.addEventListener("visibilitychange", handleVisibility);
+    reducedMotion.addEventListener("change", handleMotionChange);
 
     return () => {
       cancelAnimationFrame(animationFrame);
       observer.disconnect();
 
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibility
-      );
+      document.removeEventListener("visibilitychange", handleVisibility);
+      reducedMotion.removeEventListener("change", handleMotionChange);
 
-      gl!.deleteBuffer(buffer);
-      gl!.deleteProgram(program);
-      gl!.deleteShader(vertex);
-      gl!.deleteShader(fragment);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertex);
+      gl.deleteShader(fragment);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="timeline-background"
+      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
       aria-hidden="true"
     />
   );
