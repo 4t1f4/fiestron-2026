@@ -4,8 +4,7 @@ import "./navbar.css";
 const navItems = [
   { label: "HOME", href: "#home", id: "home" },
   { label: "ABOUT", href: "#about", id: "about" },
-  { label: "INCHARGES", href: "/incharges", id: "incharges" },
-  { label: "TEAMS", href: "/teams", id: "teams" },
+  { label: "COUNCIL", href: "/council", id: "council" },
   { label: "EVENTS", href: "#events", id: "events" },
   { label: "SPONSORS", href: "#sponsors", id: "sponsors" },
   { label: "CONTACT", href: "#contact", id: "contact" },
@@ -17,21 +16,23 @@ export default function Navbar() {
 
   const currentPath = window.location.pathname;
 
+  // Track the currently visible homepage section
   useEffect(() => {
     if (currentPath !== "/") return;
 
     const sections = navItems
       .filter((item) => item.href.startsWith("#"))
       .map((item) => document.getElementById(item.id))
-      .filter((section): section is HTMLElement => section !== null);
+      .filter(
+        (section): section is HTMLElement => section !== null
+      );
 
     const observer = new IntersectionObserver(
       (entries) => {
         const visibleSections = entries
           .filter((entry) => entry.isIntersecting)
           .sort(
-            (a, b) =>
-              b.intersectionRatio - a.intersectionRatio
+            (a, b) => b.intersectionRatio - a.intersectionRatio
           );
 
         if (visibleSections.length > 0) {
@@ -51,17 +52,12 @@ export default function Navbar() {
 
   function handleNavigation(id: string) {
     setMenuOpen(false);
-
-    if (id === "incharges" || id === "teams") {
-      setActiveSection(id);
-      return;
-    }
-
     setActiveSection(id);
   }
 
   return (
     <header className="navbar">
+      {/* Logo */}
       <a
         href="/#home"
         className="navbar-logo"
@@ -70,6 +66,7 @@ export default function Navbar() {
         FIESTRON<span>2026</span>
       </a>
 
+      {/* Mobile Menu Toggle */}
       <button
         className={`navbar-toggle ${menuOpen ? "open" : ""}`}
         onClick={() => setMenuOpen(!menuOpen)}
@@ -81,14 +78,13 @@ export default function Navbar() {
         <span />
       </button>
 
+      {/* Navigation Links */}
       <nav className={`navbar-links ${menuOpen ? "show" : ""}`}>
         {navItems.map((item) => {
           const isActive =
-            activeSection === item.id ||
-            (item.id === "incharges" &&
-              currentPath === "/incharges") ||
-            (item.id === "teams" &&
-              currentPath === "/teams");
+            item.id === "council"
+              ? currentPath === "/council"
+              : currentPath === "/" && activeSection === item.id;
 
           const href =
             item.href.startsWith("#") && currentPath !== "/"
