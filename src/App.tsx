@@ -1,13 +1,17 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+
 import Navbar from "./components/Navbar/Navbar";
 import CustomCursor from "./components/CustomCursor/CustomCursor";
 
 import Hero from "./sections/Hero/Hero.tsx";
 import About from "./sections/About/About.tsx";
-import Team from "./sections/Team/Team";
 
 import TimelineBackground from "./sections/Timeline/TimelineBackground";
 
-export default function App() {
+import Council from "./pages/Council/Council";
+
+function Home() {
   return (
     <>
       <CustomCursor />
@@ -28,12 +32,29 @@ export default function App() {
           </div>
 
         </section>
-        <Team />
+  
 
         
 
         {/* Add remaining sections here */}
       </main>
     </>
+  );
+}
+
+
+export default function App() {
+  return(
+    <BrowserRouter>
+      <CustomCursor />
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/council" element={<Council />} />
+      </Routes>
+
+    
+    </BrowserRouter>
   );
 }
