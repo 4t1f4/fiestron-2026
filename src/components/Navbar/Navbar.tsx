@@ -2,21 +2,21 @@ import { useEffect, useState } from "react";
 import "./navbar.css";
 
 const navItems = [
-  { label: "HOME", href: "#home", id: "home" },
   { label: "ABOUT", href: "#about", id: "about" },
   { label: "COUNCIL", href: "/council", id: "council" },
+  { label: "TIMELINE", href: "#timeline", id: "timeline" },
   { label: "EVENTS", href: "#events", id: "events" },
   { label: "SPONSORS", href: "#sponsors", id: "sponsors" },
   { label: "CONTACT", href: "#contact", id: "contact" },
 ];
 
 export default function Navbar() {
-  const [activeSection, setActiveSection] = useState("home");
+  const [activeSection, setActiveSection] = useState("about");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const currentPath = window.location.pathname;
 
-  // Track the currently visible homepage section
+  // Keep track of the section currently visible on the homepage
   useEffect(() => {
     if (currentPath !== "/") return;
 
@@ -57,16 +57,16 @@ export default function Navbar() {
 
   return (
     <header className="navbar">
-      {/* Logo */}
+      {/* Fiestron logo also takes users back to the homepage */}
       <a
         href="/#home"
         className="navbar-logo"
-        onClick={() => handleNavigation("home")}
+        onClick={() => handleNavigation("about")}
       >
         FIESTRON<span>2026</span>
       </a>
 
-      {/* Mobile Menu Toggle */}
+      {/* Toggle the navigation menu on smaller screens */}
       <button
         className={`navbar-toggle ${menuOpen ? "open" : ""}`}
         onClick={() => setMenuOpen(!menuOpen)}
@@ -78,7 +78,7 @@ export default function Navbar() {
         <span />
       </button>
 
-      {/* Navigation Links */}
+      {/* Main navigation links */}
       <nav className={`navbar-links ${menuOpen ? "show" : ""}`}>
         {navItems.map((item) => {
           const isActive =
