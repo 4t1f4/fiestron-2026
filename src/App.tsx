@@ -1,50 +1,50 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Intro
+import Intro from "./components/Intro/Intro";
 
-import Navbar from "./components/Navbar/Navbar";
+// Global Components
 import CustomCursor from "./components/CustomCursor/CustomCursor";
+import Navbar from "./components/Navbar/Navbar";
 
+// Home Sections
 import Hero from "./sections/Hero/Hero.tsx";
 import About from "./sections/About/About.tsx";
-
 import Timeline from "./sections/Timeline/Timeline";
 
+// Pages
 import Council from "./pages/Council/Council";
 
 function Home() {
   return (
     <>
-      <CustomCursor />
-
       <Navbar />
 
       <main>
         <Hero />
         <About />
         <Timeline />
-  
-
-        
-
-        {/* Add remaining sections here */}
       </main>
     </>
   );
 }
 
-
 export default function App() {
-  return(
+  return (
     <BrowserRouter>
+      {/* One cursor for the entire website */}
       <CustomCursor />
-      <Navbar />
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Initial Tunnel Intro */}
+        <Route path="/" element={<Intro />} />
+
+        {/* Main Fiestron Website */}
+        <Route path="/home" element={<Home />} />
+
+        {/* Council Page */}
         <Route path="/council" element={<Council />} />
       </Routes>
-
-    
     </BrowserRouter>
   );
 }
