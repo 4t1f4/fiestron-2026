@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 // Colours used throughout the Fiestron tunnel
@@ -11,8 +11,16 @@ const COLORS = {
   neonPink: "#E4369A",
 };
 
-// Pass the tunnel's position and depth information to the fragment shader
-const vertexShader = `
+// Convert hex colours to linear RGB for accurate shader rendering
+function displayColor(hex: string): THREE.Color {
+  return new THREE.Color().setStyle(
+    hex,
+    THREE.LinearSRGBColorSpace
+  );
+}
+
+// Vertex shader
+const vertexShader = /* glsl */ `
 varying vec2 vUv;
 varying float vDepth;
 
@@ -26,13 +34,12 @@ void main() {
 }
 `;
 
-// Creates the glowing rings, tunnel lighting and depth effect
-const fragmentShader = `
+// Fragment shader
+const fragmentShader = /* glsl */ `
 uniform float uTime;
 uniform float uRings;
 
 uniform vec3 uA;
-uniform vec3 uB;
 uniform vec3 uBase;
 uniform vec3 uFog;
 
@@ -41,43 +48,41 @@ varying float vDepth;
 
 void main() {
 
-  // Animate the rings so they appear to move through the tunnel
+  // Animated neon rings
   float rings = fract(vUv.x * uRings - uTime * 1.6);
   float line = smoothstep(0.94, 1.0, rings);
 
-  // Add subtle lines running along the tunnel
+  // Longitudinal tunnel ribs
   float ribs = smoothstep(0.92, 1.0, fract(vUv.y * 24.0));
 
-  // Create a moving pulse of light between the rings
+  // Travelling light pulse
   float pulse = 1.0 - smoothstep(
     0.0,
     0.15,
     fract(vUv.x * 12.0 - uTime * 0.28)
   );
 
-  // Blend the burgundy and plum shades to give the tunnel some depth
+  // Tunnel illumination
   float illumination =
     0.5 + 0.5 * sin(vUv.y * 6.2832);
 
+  // Base tunnel colour
   vec3 color = mix(
     uFog,
     uBase,
     0.38 + illumination * 0.62
   );
 
-  // Add a soft wine-magenta glow to the tunnel walls
-  color += uB * (0.08 + illumination * 0.16);
-
-  // Make the moving circular rings stand out with neon pink
+  // Bright neon pink rings
   color += uA * line * (0.55 + pulse * 1.6);
 
-  // Give the rings a little extra glow
+  // Additional ring glow
   color += uA * line * 0.12;
 
-  // Add subtle magenta lighting along the tunnel
-  color += uB * ribs * 0.35;
+  // Burgundy tunnel ribs
+  color += uBase * ribs * 0.35;
 
-  // Fade the tunnel into darkness as it gets further away
+  // Distance fog
   float fog = smoothstep(4.0, 38.0, vDepth);
 
   color = mix(color, uFog, fog);
@@ -86,17 +91,33 @@ void main() {
 }
 `;
 
-// Handles the tunnel shape, lighting and camera movement
-function TunnelScene() {
+function TunnelScene({
+  deceleration,
+}: {
+  deceleration: boolean;
+}) {
+  const { camera, size, pointer } = useThree();
 
-  // Build a curved path for the tunnel
+  // Responsive camera
+  useEffect(() => {
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov =
+        size.width < 480
+          ? 88
+          : size.width < 768
+          ? 80
+          : 70;
+
+      camera.updateProjectionMatrix();
+    }
+  }, [camera, size.width]);
+
+  // Create curved tunnel path
   const curve = useMemo(() => {
-
     const points: THREE.Vector3[] = [];
     const segments = 16;
 
     for (let i = 0; i < segments; i++) {
-
       const angle = (i / segments) * Math.PI * 2;
       const radius = 80 + Math.sin(angle * 3) * 14;
 
@@ -115,10 +136,9 @@ function TunnelScene() {
       "catmullrom",
       0.5
     );
-
   }, []);
 
-  // Turn the curved path into the actual tunnel
+  // Create tunnel geometry
   const geometry = useMemo(
     () => new THREE.TubeGeometry(curve, 900, 3.4, 42, true),
     [curve]
@@ -128,10 +148,9 @@ function TunnelScene() {
     return () => geometry.dispose();
   }, [geometry]);
 
-  // Set up the values used to control the tunnel's shader effects
+  // Shader uniforms
   const uniforms = useMemo(
     () => ({
-
       uTime: {
         value: 0,
       },
@@ -140,31 +159,25 @@ function TunnelScene() {
         value: Math.round(curve.getLength() / 2.2),
       },
 
-      // Main neon pink used for the glowing rings
+      // Neon pink
       uA: {
-        value: new THREE.Color(COLORS.neonPink),
+        value: displayColor(COLORS.neonPink),
       },
 
-      // Wine-magenta shade used for the tunnel lighting
-      uB: {
-        value: new THREE.Color(COLORS.wineMagenta),
-      },
-
-      // Base colour of the tunnel walls
+      // Tunnel base
       uBase: {
-        value: new THREE.Color(COLORS.burgundy),
+        value: displayColor(COLORS.burgundy),
       },
 
-      // Dark shade used for the background and distance fade
+      // Background fog
       uFog: {
-        value: new THREE.Color(COLORS.darkPlum),
+        value: displayColor(COLORS.background),
       },
-
     }),
     [curve]
   );
 
-  // Apply the custom shader to the tunnel
+  // Shader material
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -177,54 +190,62 @@ function TunnelScene() {
     [uniforms]
   );
 
+  // Dispose material
   useEffect(() => {
     return () => material.dispose();
   }, [material]);
 
-  // Keep track of the camera's position and movement
+  // Camera movement state
   const state = useMemo(
     () => ({
       progress: 0,
       tilt: new THREE.Vector2(),
       position: new THREE.Vector3(),
       ahead: new THREE.Vector3(),
+      motionSpeed: 1,
     }),
     []
   );
 
-  // Update the tunnel and camera on every frame
-  useFrame(({ camera, pointer }, delta) => {
-
+  // Animate tunnel
+  useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05);
 
-    // Keep the glowing rings moving
-    uniforms.uTime.value += dt;
+    // Gradually decelerate
+    const targetSpeed = deceleration ? 0.18 : 1;
 
-    // Slowly move the camera along the tunnel path
+    state.motionSpeed = THREE.MathUtils.damp(
+      state.motionSpeed,
+      targetSpeed,
+      1.15,
+      dt
+    );
+
+    // Move shader rings
+    uniforms.uTime.value += dt * state.motionSpeed;
+
+    // Move camera through tunnel
     state.progress =
-      (state.progress + dt * 0.018) % 1;
+      (state.progress + dt * 0.018 * state.motionSpeed) % 1;
 
     curve.getPointAt(
       state.progress,
       state.position
     );
 
-    // Find a point slightly ahead so the camera knows where to look
     curve.getPointAt(
       (state.progress + 0.01) % 1,
       state.ahead
     );
 
-    // Update the camera position and direction
     camera.position.copy(state.position);
     camera.lookAt(state.ahead);
 
-    // Let the camera respond smoothly to mouse movement
+    // Mouse / pointer interaction
     state.tilt.lerp(pointer, 0.05);
 
     camera.rotateZ(-state.tilt.x * 0.35);
     camera.rotateX(state.tilt.y * 0.15);
-
   });
 
   return (
@@ -235,9 +256,12 @@ function TunnelScene() {
   );
 }
 
-// Displays the tunnel across the entire screen
-export default function Tunnel() {
-
+// Main tunnel component
+export default function Tunnel({
+  deceleration = false,
+}: {
+  deceleration?: boolean;
+}) {
   return (
     <div
       className="fixed inset-0 z-0 overflow-hidden"
@@ -257,8 +281,13 @@ export default function Tunnel() {
           antialias: false,
           powerPreference: "low-power",
         }}
+        style={{
+          width: "100%",
+          height: "100%",
+          touchAction: "none",
+        }}
       >
-        <TunnelScene />
+        <TunnelScene deceleration={deceleration} />
       </Canvas>
     </div>
   );
