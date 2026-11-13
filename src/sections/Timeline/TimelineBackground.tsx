@@ -76,10 +76,14 @@ float ridges(vec2 p) {
 }
 
 void main() {
+  // Use absolute pixel mapping scaled by min resolution dimension 
+  // so the pattern tiles seamlessly over tall/long scrollable sections
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   float t = uTime * 0.035;
 
-  vec2 p = (vUv - 0.5) * vec2(aspect, 1.0) * 3.0;
+  // Use gl_FragCoord combined with uResolution to maintain full coverage on long pages
+  vec2 normalizedCoord = gl_FragCoord.xy / min(uResolution.x, uResolution.y);
+  vec2 p = (normalizedCoord - 0.5) * 3.0;
 
   vec2 q = vec2(
     fbm(p * 0.55 + t * vec2(0.7, 0.45)),
@@ -107,8 +111,9 @@ void main() {
 
   color = 0.32 * (vec3(1.0) - exp(-color * 2.4 / 0.32));
 
+  // Soft uniform vignette mapped to screen ratio
   vec2 vignette = (vUv - 0.5) * vec2(aspect, 1.0);
-  color *= 1.0 - 0.4 * dot(vignette, vignette);
+  color *= 1.0 - 0.25 * dot(vignette, vignette);
 
   float grain = hash21(
     gl_FragCoord.xy + fract(uTime * 0.31) * 149.0
@@ -125,7 +130,6 @@ export default function TimelineBackground() {
 
   useEffect(() => {
     const canvasElement = canvasRef.current;
-
     if (!canvasElement) return;
 
     const canvas: HTMLCanvasElement = canvasElement;
@@ -143,14 +147,9 @@ export default function TimelineBackground() {
 
     const gl: WebGLRenderingContext = context;
 
-    function createShader(
-      type: number,
-      source: string
-    ): WebGLShader | null {
+    function createShader(type: number, source: string): WebGLShader | null {
       const shader = gl.createShader(type);
-
       if (!shader) return null;
-
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
 
@@ -173,7 +172,6 @@ export default function TimelineBackground() {
     }
 
     const program = gl.createProgram();
-
     if (!program) {
       gl.deleteShader(vertex);
       gl.deleteShader(fragment);
@@ -186,11 +184,9 @@ export default function TimelineBackground() {
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       console.error(gl.getProgramInfoLog(program));
-
       gl.deleteProgram(program);
       gl.deleteShader(vertex);
       gl.deleteShader(fragment);
-
       return;
     }
 
@@ -204,7 +200,6 @@ export default function TimelineBackground() {
     ]);
 
     const buffer = gl.createBuffer();
-
     if (!buffer) {
       gl.deleteProgram(program);
       gl.deleteShader(vertex);
@@ -216,7 +211,6 @@ export default function TimelineBackground() {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
     const position = gl.getAttribLocation(program, "position");
-
     gl.enableVertexAttribArray(position);
     gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
@@ -227,13 +221,10 @@ export default function TimelineBackground() {
     let startTime = performance.now();
     let paused = document.hidden;
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     function render(now: number) {
       if (paused) return;
-
       const elapsed = (now - startTime) / 1000;
 
       gl.useProgram(program);
@@ -247,16 +238,8 @@ export default function TimelineBackground() {
 
     function resize() {
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
-
-      const width = Math.max(
-        1,
-        Math.floor(canvas.clientWidth * pixelRatio)
-      );
-
-      const height = Math.max(
-        1,
-        Math.floor(canvas.clientHeight * pixelRatio)
-      );
+      const width = Math.max(1, Math.floor(canvas.clientWidth * pixelRatio));
+      const height = Math.max(1, Math.floor(canvas.clientHeight * pixelRatio));
 
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
@@ -274,7 +257,6 @@ export default function TimelineBackground() {
 
     function startAnimation() {
       cancelAnimationFrame(animationFrame);
-
       if (paused) return;
 
       if (reducedMotion.matches) {
@@ -287,7 +269,6 @@ export default function TimelineBackground() {
 
     function handleVisibility() {
       paused = document.hidden;
-
       if (paused) {
         cancelAnimationFrame(animationFrame);
       } else {
@@ -300,11 +281,9 @@ export default function TimelineBackground() {
     }
 
     const observer = new ResizeObserver(resize);
-
     observer.observe(canvas);
 
     const section = canvas.closest(".timeline-section");
-
     if (section) {
       observer.observe(section);
     }
@@ -318,10 +297,8 @@ export default function TimelineBackground() {
     return () => {
       cancelAnimationFrame(animationFrame);
       observer.disconnect();
-
       document.removeEventListener("visibilitychange", handleVisibility);
       reducedMotion.removeEventListener("change", handleMotionChange);
-
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
       gl.deleteShader(vertex);
