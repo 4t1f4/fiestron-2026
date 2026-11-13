@@ -17,33 +17,41 @@ import Council from "./pages/Council/Council";
 
 function Home() {
   return (
-    <>
-      <Navbar />
-
-      <main>
-        <Hero />
-        <About />
-        <Timeline />
-      </main>
-    </>
+    <main>
+      <Hero />
+      <About />
+      <Timeline />
+    </main>
   );
 }
 
 export default function App() {
   return (
     <BrowserRouter>
-      {/* One cursor for the entire website */}
       <CustomCursor />
-
+      
       <Routes>
-        {/* Initial Tunnel Intro */}
         <Route path="/" element={<Intro />} />
 
-        {/* Main Fiestron Website */}
-        <Route path="/home" element={<Home />} />
+        <Route
+          path="/home"
+          element={
+            <>
+              <Navbar />
+              <Home />
+            </>
+          }
+        />
 
-        {/* Council Page */}
-        <Route path="/council" element={<Council />} />
+        <Route
+          path="/council"
+          element={
+            <>
+              <Navbar />
+              <Council />
+            </>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
