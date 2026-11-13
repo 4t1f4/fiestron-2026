@@ -544,40 +544,24 @@ function EventRow({
   markerRef,
   variants,
 }: EventRowProps) {
-
-  const categoryClass =
-    categoryColors[event.category];
-
-  const categoryLabel =
-    categoryDescriptions[event.category];
+  const categoryClass = categoryColors[event.category];
+  const categoryLabel = categoryDescriptions[event.category];
 
   return (
-
     <motion.article
       variants={variants}
       className="relative grid w-full grid-cols-[32px_minmax(0,1fr)] items-start gap-x-4 md:grid-cols-[minmax(0,1fr)_88px_minmax(0,1fr)] md:gap-x-0"
     >
-
       {/* NUMBERED RAIL NODE */}
-
       <div
         ref={markerRef}
         className="relative z-20 col-start-1 row-span-2 flex items-start justify-center pt-2 md:col-start-2 md:row-span-1 md:pt-0"
       >
         <motion.div
           animate={{
-            borderColor: passed
-              ? "#FF2E93"
-              : "rgba(255,46,147,0.5)",
-
-            backgroundColor: passed
-              ? "#FF2E93"
-              : "#180710",
-
-            color: passed
-              ? "#FFFFFF"
-              : "#FF8BC2",
-
+            borderColor: passed ? "#FF2E93" : "rgba(255,46,147,0.5)",
+            backgroundColor: passed ? "#FF2E93" : "#180710",
+            color: passed ? "#FFFFFF" : "#FF8BC2",
             boxShadow: passed
               ? "0 0 18px rgba(255,46,147,0.65)"
               : "0 0 8px rgba(255,46,147,0.12)",
@@ -590,56 +574,39 @@ function EventRow({
       </div>
 
       {/* TIME + CATEGORY SIDE */}
-
       <div
         className={`col-start-2 row-start-1 mb-4 min-w-0 md:row-start-1 md:mb-0 md:self-center ${
           isRight
-            ? "md:col-start-1 md:pr-12 md:text-right"
-            : "md:col-start-3 md:pl-12 md:text-left"
+            ? "md:col-start-1 md:pr-12 md:text-right flex flex-col md:items-end"
+            : "md:col-start-3 md:pl-12 md:text-left flex flex-col md:items-start"
         }`}
       >
+        <span className="mb-2 font-mono text-[9px] tracking-[0.25em] text-[#A99AA5]">
+          EVENT TIME
+        </span>
 
-        <div className="flex flex-wrap items-center gap-3 md:gap-4">
+        <h3 className="font-['Orbitron'] text-xl font-black tracking-tight text-white sm:text-2xl lg:text-3xl mb-3">
+          {event.time}
+        </h3>
 
-          <div
-            className={`flex flex-col ${
-              isRight
-                ? "md:ml-auto md:items-end"
-                : "md:items-start"
-            }`}
-          >
-
-            <span className="mb-2 font-mono text-[9px] tracking-[0.25em] text-[#A99AA5]">
-              EVENT TIME
-            </span>
-
-            <h3 className="font-['Orbitron'] text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">
-              {event.time}
-            </h3>
-
-          </div>
-
+        <div className={`flex items-center ${isRight ? "md:justify-end" : "md:justify-start"}`}>
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1.5 font-mono text-[9px] font-semibold tracking-wider ${categoryClass}`}
           >
             {categoryLabel}
           </span>
-
         </div>
 
         <div
-          className={`mt-3 hidden h-px w-20 bg-gradient-to-r from-[#FF2E93]/70 to-transparent md:block ${
+          className={`mt-4 hidden h-px w-20 bg-gradient-to-r from-[#FF2E93]/70 to-transparent md:block ${
             isRight
-              ? "md:ml-auto md:bg-gradient-to-l"
+              ? "md:ml-auto md:bg-gradient-to-l md:from-[#FF2E93]/70 md:to-transparent"
               : ""
           }`}
         />
-
       </div>
 
-
       {/* EVENT CARD */}
-
       <div
         className={`col-start-2 row-start-2 min-w-0 md:row-start-1 ${
           isRight
@@ -647,62 +614,39 @@ function EventRow({
             : "md:col-start-1 md:pr-12"
         }`}
       >
-
         <div
           className={`group relative w-full overflow-hidden rounded-xl border border-[#FF2E93]/25 bg-gradient-to-br from-[#230A18]/95 via-[#180710]/95 to-[#0C050A]/95 p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#FF2E93]/70 hover:shadow-[0_12px_35px_rgba(255,46,147,0.14)] sm:p-7 lg:p-8 ${
-            isRight
-              ? "md:mr-auto"
-              : "md:ml-auto"
+            isRight ? "md:mr-auto" : "md:ml-auto"
           }`}
         >
-
           {/* SUBTLE CARD GLOW */}
-
           <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#FF2E93]/[0.07] blur-3xl transition-all duration-500 group-hover:bg-[#FF2E93]/[0.13]" />
 
           {/* EVENT NAME + ICON */}
-
           <div className="relative mb-5 flex items-center gap-4">
-
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[#FF2E93]/30 bg-[#FF2E93]/10 text-[#FF8BC2] transition-all duration-300 group-hover:border-[#FF2E93]/70 group-hover:bg-[#FF2E93]/20">
-
               <Icon size={23} strokeWidth={1.8} />
-
             </div>
 
             <h3 className="min-w-0 font-['Orbitron'] text-lg font-bold tracking-wide text-[#F5F0F5] sm:text-xl lg:text-2xl">
               {event.name}
             </h3>
-
           </div>
 
-
           {/* DESCRIPTION */}
-
           <p className="relative mb-6 text-sm leading-7 text-[#BDAEB8]">
             {event.description ||
               `Step into ${event.name} and put your skills to the test. Be part of the experience at Fiestron 2026.`}
           </p>
 
-
           {/* VENUE */}
-
           <div className="relative mb-6 flex items-center gap-3 border-t border-white/[0.07] pt-5 text-sm text-[#D7C5D1]">
-
-            <MapPin
-              size={17}
-              className="shrink-0 text-[#FF2E93]"
-            />
-
+            <MapPin size={17} className="shrink-0 text-[#FF2E93]" />
             <span>{event.venue}</span>
-
           </div>
 
-
           {/* BUTTONS */}
-
           <div className="relative flex flex-wrap items-center gap-3">
-
             <a
               href={event.registrationUrl ?? "#register"}
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#FF2E93]/50 bg-[#FF2E93]/10 px-5 py-3 font-['Orbitron'] text-[10px] font-semibold tracking-wider text-white transition-all duration-300 hover:border-[#FF2E93] hover:bg-[#FF2E93] hover:shadow-[0_0_18px_rgba(255,46,147,0.35)]"
@@ -718,14 +662,9 @@ function EventRow({
               RULES & REGULATIONS
               <ArrowUpRight size={14} />
             </a>
-
           </div>
-
         </div>
-
       </div>
-
     </motion.article>
-
   );
 }
