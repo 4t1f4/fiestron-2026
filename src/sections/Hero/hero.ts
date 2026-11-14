@@ -44,6 +44,7 @@ export function initHero(
 
   let width = 0;
   let height = 0;
+
   let titleWidth = 0;
   let titleHeight = 0;
 
@@ -69,7 +70,6 @@ export function initHero(
   ];
 
   // BACKGROUND PARTICLES (DENSE GRID WITH NO SCATTERING)
-
   function createBackgroundParticles() {
     const rect = backgroundCanvas.getBoundingClientRect();
 
@@ -109,7 +109,6 @@ export function initHero(
   }
 
   // FIESTRON TITLE PARTICLES
-
   function createTitleParticles() {
     const rect = canvas.getBoundingClientRect();
 
@@ -141,21 +140,56 @@ export function initHero(
 
     offCtx.font = `900 ${fontSize}px Orbitron, sans-serif`;
 
-    const textWidth = offCtx.measureText("FIESTRON").width;
-    const maximumWidth = titleWidth * 0.75;
+    // Same "mobile" threshold already used below for the particle gap.
+    const isMobileTitle = titleWidth < 600;
 
-    if (textWidth > maximumWidth) {
-      fontSize *= maximumWidth / textWidth;
+    if (isMobileTitle) {
+      // MOBILE ONLY: add a small extra gap between "F" and "I" so they
+      // don't merge. Everything else in the word keeps its normal spacing.
+      const FI_GAP_EM = 0.1;
+
+      offCtx.textAlign = "left";
+
+      const maximumWidth = titleWidth * 0.75;
+      const totalWidth =
+        offCtx.measureText("FIESTRON").width + fontSize * FI_GAP_EM;
+
+      if (totalWidth > maximumWidth) {
+        fontSize *= maximumWidth / totalWidth;
+      }
+
+      offCtx.font = `900 ${fontSize}px Orbitron, sans-serif`;
+      offCtx.fillStyle = "#FFFFFF";
+
+      const fullWidth = offCtx.measureText("FIESTRON").width;
+      const restWidth = offCtx.measureText("IESTRON").width;
+      // Advance of "F" (including any kerning with "I") in the original word
+      const fAdvance = fullWidth - restWidth;
+      const fiGap = fontSize * FI_GAP_EM;
+
+      const startX = (titleWidth - (fullWidth + fiGap)) / 2;
+      const centerY = titleHeight / 2;
+
+      offCtx.fillText("F", startX, centerY);
+      offCtx.fillText("IESTRON", startX + fAdvance + fiGap, centerY);
+    } else {
+      // DESKTOP / LAPTOP: original rendering, unchanged
+      const textWidth = offCtx.measureText("FIESTRON").width;
+      const maximumWidth = titleWidth * 0.75;
+
+      if (textWidth > maximumWidth) {
+        fontSize *= maximumWidth / textWidth;
+      }
+
+      offCtx.font = `900 ${fontSize}px Orbitron, sans-serif`;
+      offCtx.fillStyle = "#FFFFFF";
+
+      offCtx.fillText(
+        "FIESTRON",
+        titleWidth / 2,
+        titleHeight / 2
+      );
     }
-
-    offCtx.font = `900 ${fontSize}px Orbitron, sans-serif`;
-    offCtx.fillStyle = "#FFFFFF";
-
-    offCtx.fillText(
-      "FIESTRON",
-      titleWidth / 2,
-      titleHeight / 2
-    );
 
     const imageData = offCtx.getImageData(
       0,
@@ -193,7 +227,6 @@ export function initHero(
   }
 
   // DRAW BACKGROUND PARTICLES WITH CORNER VIGNETTE FADE
-
   function drawBackgroundParticles() {
     backgroundCtx.clearRect(0, 0, width, height);
 
@@ -224,7 +257,6 @@ export function initHero(
       if (pointer.active) {
         const dx = dot.x - pointer.backgroundX;
         const dy = dot.y - pointer.backgroundY;
-
         const distanceSquared = dx * dx + dy * dy;
         const forceRadius = 200;
 
@@ -254,13 +286,13 @@ export function initHero(
       const centerY = height / 2;
       const distanceFromCenter = Math.hypot(dot.x - centerX, dot.y - centerY);
       const maxRadius = Math.hypot(centerX, centerY) * 0.88;
-      
+
       let edgeFade = 1;
       if (distanceFromCenter > maxRadius * 0.5) {
         edgeFade = Math.max(0, 1 - (distanceFromCenter - maxRadius * 0.5) / (maxRadius * 0.5));
       }
 
-      let opacity = 0.28 * edgeFade;
+      let opacity = 0.35 * edgeFade;
 
       if (pointer.active) {
         const dx = dot.x - pointer.backgroundX;
@@ -269,6 +301,7 @@ export function initHero(
 
         if (distanceSquared < 200 * 200) {
           const distance = Math.sqrt(distanceSquared);
+
           opacity = Math.max(
             opacity,
             (0.7 * (1 - distance / 200)) * edgeFade
@@ -304,7 +337,6 @@ export function initHero(
   }
 
   // DRAW TITLE PARTICLES
-
   function drawTitleParticles() {
     ctx.clearRect(0, 0, titleWidth, titleHeight);
 
@@ -318,7 +350,6 @@ export function initHero(
       if (pointer.active) {
         const dx = particle.x - pointer.titleX;
         const dy = particle.y - pointer.titleY;
-
         const distanceSquared = dx * dx + dy * dy;
         const forceRadius = 190;
 
@@ -375,7 +406,6 @@ export function initHero(
   }
 
   // ANIMATION
-
   function animate() {
     if (disposed) return;
 
@@ -385,8 +415,7 @@ export function initHero(
     animationFrame = requestAnimationFrame(animate);
   }
 
-  // POINTER MOVEMENT
-
+  // POINTER MOVEMENT (mouse / pen) — unchanged
   function handlePointerMove(event: PointerEvent) {
     if (event.pointerType === "touch") return;
 
@@ -412,8 +441,40 @@ export function initHero(
     pointer.active = false;
   }
 
-  // RESIZE
+  // TOUCH MOVEMENT (phones / tablets) — feeds the SAME pointer state,
+  // so the existing repulsion + return animation is reused as-is.
+  // Touch events are used (instead of pointer events) because browsers
+  // cancel pointer events as soon as a drag turns into a page scroll,
+  // whereas passive touchmove keeps firing, so dragging works and the
+  // page can still scroll normally.
+  function updatePointerFromTouch(event: TouchEvent) {
+    const touch = event.touches[0];
 
+    if (!touch) return;
+
+    const canvasRect = canvas.getBoundingClientRect();
+    const backgroundRect = backgroundCanvas.getBoundingClientRect();
+
+    pointer.backgroundX = touch.clientX - backgroundRect.left;
+    pointer.backgroundY = touch.clientY - backgroundRect.top;
+
+    pointer.titleX = touch.clientX - canvasRect.left;
+    pointer.titleY = touch.clientY - canvasRect.top;
+
+    pointer.active = true;
+  }
+
+  function handleTouchEnd(event: TouchEvent) {
+    // Keep reacting if another finger is still down
+    if (event.touches.length > 0) {
+      updatePointerFromTouch(event);
+      return;
+    }
+
+    pointer.active = false;
+  }
+
+  // RESIZE
   function handleResize() {
     if (disposed || !started) return;
 
@@ -426,7 +487,6 @@ export function initHero(
   }
 
   // START
-
   async function start() {
     await document.fonts.ready;
 
@@ -443,12 +503,16 @@ export function initHero(
   hero.addEventListener("pointermove", handlePointerMove);
   hero.addEventListener("pointerleave", handlePointerLeave);
 
+  hero.addEventListener("touchstart", updatePointerFromTouch, { passive: true });
+  hero.addEventListener("touchmove", updatePointerFromTouch, { passive: true });
+  hero.addEventListener("touchend", handleTouchEnd, { passive: true });
+  hero.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+
   window.addEventListener("resize", handleResize);
 
   start();
 
   // CLEANUP
-
   return () => {
     disposed = true;
 
@@ -456,6 +520,11 @@ export function initHero(
 
     hero.removeEventListener("pointermove", handlePointerMove);
     hero.removeEventListener("pointerleave", handlePointerLeave);
+
+    hero.removeEventListener("touchstart", updatePointerFromTouch);
+    hero.removeEventListener("touchmove", updatePointerFromTouch);
+    hero.removeEventListener("touchend", handleTouchEnd);
+    hero.removeEventListener("touchcancel", handleTouchEnd);
 
     window.removeEventListener("resize", handleResize);
   };
