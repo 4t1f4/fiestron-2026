@@ -6,6 +6,7 @@ import Intro from "./components/Intro/Intro";
 // Global Components
 import CustomCursor from "./components/CustomCursor/CustomCursor";
 import Navbar from "./components/Navbar/Navbar";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 
 // Home Sections
 import Hero from "./sections/Hero/Hero.tsx";
@@ -28,8 +29,10 @@ function Home() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
+
       <CustomCursor />
-      
+
       <Routes>
         <Route path="/" element={<Intro />} />
 
