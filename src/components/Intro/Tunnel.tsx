@@ -4,14 +4,14 @@ import * as THREE from "three";
 
 // Colours used throughout the Fiestron tunnel
 const COLORS = {
-  background: "#01040A",
-  darkPlum: "#0C0810",
-  burgundy: "#59153C",
-  wineMagenta: "#98286E",
-  neonPink: "#E4369A",
+  background: "#06040A",
+  darkPlum: "#0C0714",
+  burgundy: "#12091F",
+  wineMagenta: "#9147FF",
+  neonPink: "#AF69FF",
 };
 
-// Convert hex colours to linear RGB for accurate shader rendering
+// Convert hex colours to linear RGB
 function displayColor(hex: string): THREE.Color {
   return new THREE.Color().setStyle(
     hex,
@@ -38,6 +38,7 @@ void main() {
 const fragmentShader = /* glsl */ `
 uniform float uTime;
 uniform float uRings;
+uniform float uMobile;
 
 uniform vec3 uA;
 uniform vec3 uBase;
@@ -73,13 +74,16 @@ void main() {
     0.38 + illumination * 0.62
   );
 
-  // Bright neon pink rings
-  color += uA * line * (0.55 + pulse * 1.6);
+  // Mobile-only neon brightness boost
+  float ringBoost = mix(1.0, 1.8, uMobile);
+
+  // Neon rings
+  color += uA * line * (0.55 + pulse * 1.6) * ringBoost;
 
   // Additional ring glow
-  color += uA * line * 0.12;
+  color += uA * line * 0.12 * ringBoost;
 
-  // Burgundy tunnel ribs
+  // Tunnel ribs
   color += uBase * ribs * 0.35;
 
   // Distance fog
@@ -96,7 +100,9 @@ function TunnelScene({
 }: {
   deceleration: boolean;
 }) {
-  const { camera, size, pointer } = useThree();
+  const { camera, size, pointer, gl } = useThree();
+
+  const isMobile = size.width < 768;
 
   // Responsive camera
   useEffect(() => {
@@ -111,6 +117,47 @@ function TunnelScene({
       camera.updateProjectionMatrix();
     }
   }, [camera, size.width]);
+
+  // Explicit mobile touch tracking
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const element = gl.domElement;
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!event.touches.length) return;
+
+      event.preventDefault();
+
+      const touch = event.touches[0];
+      const rect = element.getBoundingClientRect();
+
+      const x =
+        ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+
+      const y =
+        -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+      pointer.set(x, y);
+    };
+
+    const handleTouchEnd = () => {
+      pointer.set(0, 0);
+    };
+
+    element.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+
+    element.addEventListener("touchend", handleTouchEnd);
+    element.addEventListener("touchcancel", handleTouchEnd);
+
+    return () => {
+      element.removeEventListener("touchmove", handleTouchMove);
+      element.removeEventListener("touchend", handleTouchEnd);
+      element.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [gl, isMobile, pointer]);
 
   // Create curved tunnel path
   const curve = useMemo(() => {
@@ -159,23 +206,29 @@ function TunnelScene({
         value: Math.round(curve.getLength() / 2.2),
       },
 
-      // Neon pink
+      uMobile: {
+        value: 0,
+      },
+
       uA: {
         value: displayColor(COLORS.neonPink),
       },
 
-      // Tunnel base
       uBase: {
         value: displayColor(COLORS.burgundy),
       },
 
-      // Background fog
       uFog: {
         value: displayColor(COLORS.background),
       },
     }),
     [curve]
   );
+
+  // Update mobile-only brightness
+  useEffect(() => {
+    uniforms.uMobile.value = isMobile ? 1 : 0;
+  }, [isMobile, uniforms]);
 
   // Shader material
   const material = useMemo(
@@ -190,7 +243,6 @@ function TunnelScene({
     [uniforms]
   );
 
-  // Dispose material
   useEffect(() => {
     return () => material.dispose();
   }, [material]);
@@ -228,10 +280,7 @@ function TunnelScene({
     state.progress =
       (state.progress + dt * 0.018 * state.motionSpeed) % 1;
 
-    curve.getPointAt(
-      state.progress,
-      state.position
-    );
+    curve.getPointAt(state.progress, state.position);
 
     curve.getPointAt(
       (state.progress + 0.01) % 1,
@@ -241,11 +290,18 @@ function TunnelScene({
     camera.position.copy(state.position);
     camera.lookAt(state.ahead);
 
-    // Mouse / pointer interaction
+    // Mouse interaction on laptop
+    // Touch interaction on phone
     state.tilt.lerp(pointer, 0.05);
 
-    camera.rotateZ(-state.tilt.x * 0.35);
-    camera.rotateX(state.tilt.y * 0.15);
+    if (isMobile) {
+      camera.rotateZ(-state.tilt.x * 0.55);
+      camera.rotateX(state.tilt.y * 0.35);
+    } else {
+      // Original laptop interaction — unchanged
+      camera.rotateZ(-state.tilt.x * 0.35);
+      camera.rotateX(state.tilt.y * 0.15);
+    }
   });
 
   return (

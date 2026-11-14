@@ -44,7 +44,6 @@ export function initHero(
 
   let width = 0;
   let height = 0;
-
   let titleWidth = 0;
   let titleHeight = 0;
 
@@ -63,13 +62,15 @@ export function initHero(
   };
 
   const titleColors = [
-    "#FF2E93",
-    "#FF1744",
-    "#F5F0F5",
-    "#9D4EDD",
+    "#AF69FF",
+    "#9147FF",
+    "#FFFFFF",
+    "#D9B8FF",
   ];
 
+
   // BACKGROUND PARTICLES (DENSE GRID WITH NO SCATTERING)
+
   function createBackgroundParticles() {
     const rect = backgroundCanvas.getBoundingClientRect();
 
@@ -91,6 +92,7 @@ export function initHero(
     backgroundDots = [];
 
     // Compact and dense spacing for clean matrix look
+
     const spacing = width < 600 ? 12 : 14;
 
     for (let y = spacing / 2; y < height; y += spacing) {
@@ -109,6 +111,7 @@ export function initHero(
   }
 
   // FIESTRON TITLE PARTICLES
+
   function createTitleParticles() {
     const rect = canvas.getBoundingClientRect();
 
@@ -140,17 +143,19 @@ export function initHero(
 
     offCtx.font = `900 ${fontSize}px Orbitron, sans-serif`;
 
-    // Same "mobile" threshold already used below for the particle gap.
+    // Same mobile threshold already used below for the particle gap.
+
     const isMobileTitle = titleWidth < 600;
 
     if (isMobileTitle) {
-      // MOBILE ONLY: add a small extra gap between "F" and "I" so they
-      // don't merge. Everything else in the word keeps its normal spacing.
+      // MOBILE ONLY: add a small extra gap between "F" and "I".
+
       const FI_GAP_EM = 0.1;
 
       offCtx.textAlign = "left";
 
       const maximumWidth = titleWidth * 0.75;
+
       const totalWidth =
         offCtx.measureText("FIESTRON").width + fontSize * FI_GAP_EM;
 
@@ -163,8 +168,11 @@ export function initHero(
 
       const fullWidth = offCtx.measureText("FIESTRON").width;
       const restWidth = offCtx.measureText("IESTRON").width;
-      // Advance of "F" (including any kerning with "I") in the original word
+
+      // Advance of "F" including any kerning with "I".
+
       const fAdvance = fullWidth - restWidth;
+
       const fiGap = fontSize * FI_GAP_EM;
 
       const startX = (titleWidth - (fullWidth + fiGap)) / 2;
@@ -172,8 +180,10 @@ export function initHero(
 
       offCtx.fillText("F", startX, centerY);
       offCtx.fillText("IESTRON", startX + fAdvance + fiGap, centerY);
+
     } else {
       // DESKTOP / LAPTOP: original rendering, unchanged
+
       const textWidth = offCtx.measureText("FIESTRON").width;
       const maximumWidth = titleWidth * 0.75;
 
@@ -227,6 +237,7 @@ export function initHero(
   }
 
   // DRAW BACKGROUND PARTICLES WITH CORNER VIGNETTE FADE
+
   function drawBackgroundParticles() {
     backgroundCtx.clearRect(0, 0, width, height);
 
@@ -240,9 +251,9 @@ export function initHero(
         220
       );
 
-      gradient.addColorStop(0, "rgba(255, 46, 147, 0.07)");
-      gradient.addColorStop(0.5, "rgba(157, 78, 221, 0.025)");
-      gradient.addColorStop(1, "rgba(255, 46, 147, 0)");
+      gradient.addColorStop(0, "rgba(175, 105, 255, 0.07)");
+      gradient.addColorStop(0.5, "rgba(145, 71, 255, 0.025)");
+      gradient.addColorStop(1, "rgba(175, 105, 255, 0)");
 
       backgroundCtx.fillStyle = gradient;
       backgroundCtx.fillRect(0, 0, width, height);
@@ -257,6 +268,7 @@ export function initHero(
       if (pointer.active) {
         const dx = dot.x - pointer.backgroundX;
         const dy = dot.y - pointer.backgroundY;
+
         const distanceSquared = dx * dx + dy * dy;
         const forceRadius = 200;
 
@@ -281,15 +293,25 @@ export function initHero(
       dot.x += dot.vx;
       dot.y += dot.vy;
 
-      // Calculate distance from center to fade dots out smoothly at the edges/corners
+      // Calculate distance from center to fade dots at edges/corners.
+
       const centerX = width / 2;
       const centerY = height / 2;
-      const distanceFromCenter = Math.hypot(dot.x - centerX, dot.y - centerY);
+
+      const distanceFromCenter = Math.hypot(
+        dot.x - centerX,
+        dot.y - centerY
+      );
+
       const maxRadius = Math.hypot(centerX, centerY) * 0.88;
 
       let edgeFade = 1;
+
       if (distanceFromCenter > maxRadius * 0.5) {
-        edgeFade = Math.max(0, 1 - (distanceFromCenter - maxRadius * 0.5) / (maxRadius * 0.5));
+        edgeFade = Math.max(
+          0,
+          1 - (distanceFromCenter - maxRadius * 0.5) / (maxRadius * 0.5)
+        );
       }
 
       let opacity = 0.35 * edgeFade;
@@ -297,6 +319,7 @@ export function initHero(
       if (pointer.active) {
         const dx = dot.x - pointer.backgroundX;
         const dy = dot.y - pointer.backgroundY;
+
         const distanceSquared = dx * dx + dy * dy;
 
         if (distanceSquared < 200 * 200) {
@@ -330,13 +353,14 @@ export function initHero(
 
     for (let i = 0; i < opacityGroups.length; i++) {
       backgroundCtx.fillStyle =
-        `rgba(255, 100, 175, ${i / 11})`;
+        `rgba(175, 105, 255, ${i / 11})`;
 
       backgroundCtx.fill(opacityGroups[i]);
     }
   }
 
   // DRAW TITLE PARTICLES
+
   function drawTitleParticles() {
     ctx.clearRect(0, 0, titleWidth, titleHeight);
 
@@ -350,6 +374,7 @@ export function initHero(
       if (pointer.active) {
         const dx = particle.x - pointer.titleX;
         const dy = particle.y - pointer.titleY;
+
         const distanceSquared = dx * dx + dy * dy;
         const forceRadius = 190;
 
@@ -406,6 +431,7 @@ export function initHero(
   }
 
   // ANIMATION
+
   function animate() {
     if (disposed) return;
 
@@ -415,24 +441,19 @@ export function initHero(
     animationFrame = requestAnimationFrame(animate);
   }
 
-  // POINTER MOVEMENT (mouse / pen) — unchanged
+  // POINTER MOVEMENT (MOUSE / PEN) — UNCHANGED
+
   function handlePointerMove(event: PointerEvent) {
     if (event.pointerType === "touch") return;
 
     const canvasRect = canvas.getBoundingClientRect();
     const backgroundRect = backgroundCanvas.getBoundingClientRect();
 
-    pointer.backgroundX =
-      event.clientX - backgroundRect.left;
+    pointer.backgroundX = event.clientX - backgroundRect.left;
+    pointer.backgroundY = event.clientY - backgroundRect.top;
 
-    pointer.backgroundY =
-      event.clientY - backgroundRect.top;
-
-    pointer.titleX =
-      event.clientX - canvasRect.left;
-
-    pointer.titleY =
-      event.clientY - canvasRect.top;
+    pointer.titleX = event.clientX - canvasRect.left;
+    pointer.titleY = event.clientY - canvasRect.top;
 
     pointer.active = true;
   }
@@ -441,12 +462,8 @@ export function initHero(
     pointer.active = false;
   }
 
-  // TOUCH MOVEMENT (phones / tablets) — feeds the SAME pointer state,
-  // so the existing repulsion + return animation is reused as-is.
-  // Touch events are used (instead of pointer events) because browsers
-  // cancel pointer events as soon as a drag turns into a page scroll,
-  // whereas passive touchmove keeps firing, so dragging works and the
-  // page can still scroll normally.
+  // TOUCH MOVEMENT (PHONES / TABLETS)
+
   function updatePointerFromTouch(event: TouchEvent) {
     const touch = event.touches[0];
 
@@ -465,7 +482,8 @@ export function initHero(
   }
 
   function handleTouchEnd(event: TouchEvent) {
-    // Keep reacting if another finger is still down
+    // Keep reacting if another finger is still down.
+
     if (event.touches.length > 0) {
       updatePointerFromTouch(event);
       return;
@@ -475,6 +493,7 @@ export function initHero(
   }
 
   // RESIZE
+
   function handleResize() {
     if (disposed || !started) return;
 
@@ -487,6 +506,7 @@ export function initHero(
   }
 
   // START
+
   async function start() {
     await document.fonts.ready;
 
@@ -503,16 +523,28 @@ export function initHero(
   hero.addEventListener("pointermove", handlePointerMove);
   hero.addEventListener("pointerleave", handlePointerLeave);
 
-  hero.addEventListener("touchstart", updatePointerFromTouch, { passive: true });
-  hero.addEventListener("touchmove", updatePointerFromTouch, { passive: true });
-  hero.addEventListener("touchend", handleTouchEnd, { passive: true });
-  hero.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+  hero.addEventListener("touchstart", updatePointerFromTouch, {
+    passive: true,
+  });
+
+  hero.addEventListener("touchmove", updatePointerFromTouch, {
+    passive: true,
+  });
+
+  hero.addEventListener("touchend", handleTouchEnd, {
+    passive: true,
+  });
+
+  hero.addEventListener("touchcancel", handleTouchEnd, {
+    passive: true,
+  });
 
   window.addEventListener("resize", handleResize);
 
   start();
 
   // CLEANUP
+
   return () => {
     disposed = true;
 

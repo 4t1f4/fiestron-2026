@@ -9,7 +9,8 @@ import "./about.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Wrap every character separately for typing animation.
+
+// Split the text into individual characters for the terminal typing effect.
 function typed(text: string) {
   return Array.from(text).map((char, index) => (
     <span className="terminal-char" key={index}>
@@ -17,6 +18,7 @@ function typed(text: string) {
     </span>
   ));
 }
+
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -30,13 +32,13 @@ export default function About() {
 
     if (!section || !canvas || !terminal) return;
 
-    // Animated WebGL background
+    // Start the animated WebGL background.
     const cleanupCanvas = initAbout(section, canvas);
 
     const chars = terminal.querySelectorAll(".terminal-char");
     const cursor = terminal.querySelector(".token-cursor");
 
-    // Hide terminal characters initially
+    // Hide the code first so it can appear character by character.
     gsap.set(chars, {
       autoAlpha: 0,
     });
@@ -47,7 +49,7 @@ export default function About() {
       });
     }
 
-    // Terminal typing animation
+    // Start the typing effect when the terminal scrolls into view.
     const typingTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: terminal,
@@ -70,6 +72,7 @@ export default function About() {
       });
     }
 
+    // Remove animations and listeners when the component unmounts.
     return () => {
       cleanupCanvas?.();
 
@@ -83,15 +86,17 @@ export default function About() {
       ref={sectionRef}
       id="about"
       className="
+        about-section
         relative isolate flex min-h-screen w-full
         items-center justify-center overflow-hidden
         px-6 py-24
-        bg-[#080609]
+        bg-[#06040A]
         font-body
         max-[768px]:px-4 max-[768px]:py-16
       "
     >
-      {/* Animated WebGL Background */}
+
+      {/* Animated background sits behind all the About content. */}
       <canvas
         ref={canvasRef}
         className="
@@ -102,39 +107,41 @@ export default function About() {
         aria-hidden="true"
       />
 
-      {/* Main Content */}
+
+      {/* Main About content */}
       <div className="relative z-[1] flex w-full max-w-[900px] flex-col items-center text-center">
 
-        {/* Header */}
+        {/* Small section label */}
         <div className="mb-4 flex items-center gap-4">
-          <span className="h-px w-[35px] bg-[#FF2E93] opacity-70" />
+          <span className="h-px w-[35px] bg-[#AF69FF] opacity-70" />
 
-          <span className="text-[0.7rem] font-semibold tracking-[0.35em] text-[#A99AA5]">
+          <span className="about-eyebrow">
             ABOUT US
           </span>
 
-          <span className="h-px w-[35px] bg-[#FF2E93] opacity-70" />
+          <span className="h-px w-[35px] bg-[#AF69FF] opacity-70" />
         </div>
 
-        {/* Title */}
+
+        {/* Main heading */}
         <h2
           className="
-            mb-4 font-heading font-black
-            text-[clamp(1.8rem,4vw,3rem)]
-            tracking-[0.08em] text-[#F5F0F5]
-            drop-shadow-[0_0_20px_rgba(255,46,147,0.25)]
+            about-title
+            mb-4
+            text-[clamp(1.9rem,4.6vw,3.4rem)]
             max-[768px]:text-[clamp(1.5rem,6vw,2.2rem)]
           "
         >
           WHERE CODE MEETS CHAOS
         </h2>
 
-        {/* Subtitle */}
+
+        {/* Short introduction */}
         <p
           className="
+            about-lede
             mb-12 max-w-[580px]
             text-[0.95rem] font-light leading-[1.8]
-            text-[#A99AA5]
             max-[768px]:mb-8 max-[768px]:text-[0.85rem]
           "
         >
@@ -143,18 +150,20 @@ export default function About() {
           legacy, and endless digital horizons.
         </p>
 
-        {/* Code Editor */}
+
+        {/* Code editor */}
         <div
           className="
             mb-10 w-full overflow-hidden rounded-lg
-            border border-[rgba(255,46,147,0.25)]
+            border border-[rgba(175,105,255,0.25)]
             bg-[rgba(12,9,15,0.82)]
             text-left
             shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_25px_rgba(157,78,221,0.08)]
             backdrop-blur-[16px]
           "
         >
-          {/* Editor Top Bar */}
+
+          {/* Editor top bar */}
           <div
             className="
               flex items-center justify-between
@@ -164,12 +173,14 @@ export default function About() {
               max-[768px]:px-[0.85rem] max-[768px]:py-3
             "
           >
-            {/* Window Dots */}
+
+            {/* Original terminal window controls — unchanged */}
             <div className="flex gap-2">
               <span className="h-[10px] w-[10px] rounded-full bg-[#FF5F56]" />
               <span className="h-[10px] w-[10px] rounded-full bg-[#FFBD2E]" />
               <span className="h-[10px] w-[10px] rounded-full bg-[#27C93F]" />
             </div>
+
 
             {/* Filename */}
             <div
@@ -182,7 +193,8 @@ export default function About() {
               fiestron.config.ts
             </div>
 
-            {/* College Branding */}
+
+            {/* College branding */}
             <div
               className="
                 font-heading text-[0.62rem] font-semibold
@@ -193,9 +205,11 @@ export default function About() {
             >
               K.C. COLLEGE
             </div>
+
           </div>
 
-          {/* Terminal */}
+
+          {/* Terminal — original code and syntax colours preserved */}
           <div
             ref={terminalRef}
             className="
@@ -213,147 +227,179 @@ export default function About() {
                 </span>
               </div>
 
+
               <div className="code-line">
                 <span className="font-semibold text-[#FF2E93]">
                   {typed("const")}
                 </span>
+
                 {typed(" ")}
+
                 <span className="text-[#9D4EDD]">
                   {typed("fiestron")}
                 </span>
+
                 {typed(" = {")}
               </div>
 
+
               <div className="code-line">
                 {typed("  host: ")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"Department of Computer Science"')}
                 </span>
+
                 {typed(",")}
               </div>
+
 
               <div className="code-line">
                 {typed("  institution: ")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"Kishinchand Chellaram College"')}
                 </span>
+
                 {typed(",")}
               </div>
+
 
               <div className="code-line">
                 {typed("  tagline: ")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"Where code meets chaos"')}
                 </span>
+
                 {typed(",")}
               </div>
 
+
               <div className="code-line">
                 {typed("  legacyYears: ")}
+
                 <span className="text-[#FF8BC2]">
                   {typed("25")}
                 </span>
+
                 {typed(", ")}
+
                 <span className="text-[#6E5B6E] italic">
                   {typed("// established excellence")}
                 </span>
               </div>
 
+
               <div className="code-line">
                 {typed("  events: ")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"30+ technical & tactical battles"')}
                 </span>
+
                 {typed(",")}
               </div>
 
+
               <div className="code-line">
                 {typed("  tracks: [")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"Coding"')}
                 </span>
+
                 {typed(", ")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"AI"')}
                 </span>
+
                 {typed(", ")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"Gaming"')}
                 </span>
+
                 {typed(", ")}
+
                 <span className="text-[#00F0FF]">
                   {typed('"Design"')}
                 </span>
+
                 {typed("],")}
               </div>
+
 
               <div className="code-line">
                 {typed("};")}
               </div>
 
+
               <div className="code-line">
                 <span className="text-[#FFBE0B]">
                   {typed("initialize")}
                 </span>
+
                 {typed("(fiestron); ")}
+
+                {/* Only the cursor uses the new violet colour. */}
                 <span className="token-cursor">_</span>
               </div>
 
             </code>
           </div>
+
         </div>
 
-        {/* Action Buttons */}
+
+        {/* Action buttons */}
         <div className="flex flex-wrap justify-center gap-[1.2rem] max-[768px]:gap-3">
 
-          <a
-            href="#register"
-            className="
-              inline-flex items-center justify-center gap-4
-              rounded-[3px] border border-[rgba(255,46,147,0.6)]
-              bg-[rgba(255,46,147,0.08)]
-              px-[1.8rem] py-[0.9rem]
-              text-[0.72rem] font-semibold tracking-[0.2em]
-              text-[#F5F0F5]
-              transition-all duration-300
-              hover:-translate-y-[3px]
-              hover:bg-[rgba(255,46,147,0.18)]
-              hover:shadow-[0_0_20px_rgba(255,46,147,0.25)]
-              max-[420px]:px-[1.2rem] max-[420px]:py-[0.8rem]
-              max-[420px]:text-[0.65rem]
-              motion-reduce:transition-none
-            "
-          >
-            REGISTER NOW
+          {/* Primary action */}
+          <span className="about-btn-wrap about-btn-wrap--primary">
+            <a
+              href="#register"
+              className="about-btn about-btn--primary"
+            >
+              <span
+                className="about-btn-sheen"
+                aria-hidden="true"
+              />
 
-            <span className="text-[#FF2E93]" aria-hidden="true">
-              ↗
-            </span>
-          </a>
+              <span className="about-btn-label">
+                REGISTER NOW
+              </span>
 
-          <a
-            href="#contact"
-            className="
-              inline-flex items-center justify-center
-              rounded-[3px] border border-[rgba(157,78,221,0.4)]
-              bg-transparent
-              px-[1.8rem] py-[0.9rem]
-              text-[0.72rem] font-semibold tracking-[0.2em]
-              text-[#A99AA5]
-              transition-all duration-300
-              hover:-translate-y-[3px]
-              hover:border-[rgba(157,78,221,0.8)]
-              hover:bg-[rgba(157,78,221,0.08)]
-              hover:text-[#F5F0F5]
-              max-[420px]:px-[1.2rem] max-[420px]:py-[0.8rem]
-              max-[420px]:text-[0.65rem]
-              motion-reduce:transition-none
-            "
-          >
-            CONTACT US
-          </a>
+              <span
+                className="about-btn-arrow"
+                aria-hidden="true"
+              >
+                ↗
+              </span>
+            </a>
+          </span>
+
+
+          {/* Secondary action */}
+          <span className="about-btn-wrap about-btn-wrap--secondary">
+            <a
+              href="#contact"
+              className="about-btn about-btn--secondary"
+            >
+              <span
+                className="about-btn-sheen"
+                aria-hidden="true"
+              />
+
+              <span className="about-btn-label">
+                CONTACT US
+              </span>
+            </a>
+          </span>
 
         </div>
+
       </div>
     </section>
   );

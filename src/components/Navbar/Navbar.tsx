@@ -82,7 +82,11 @@ return (
     }
   }}
 >
-  FIESTRON<span>2026</span>
+  <img
+    src="/FiestronLogo.png"
+    alt="Fiestron 2026"
+    className="navbar-logo-img"
+  />
 </Link>
 
   <button

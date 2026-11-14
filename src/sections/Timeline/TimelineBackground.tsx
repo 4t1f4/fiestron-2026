@@ -17,10 +17,11 @@ varying vec2 vUv;
 uniform float uTime;
 uniform vec2 uResolution;
 
-const vec3 black = vec3(0.008, 0.006, 0.009);
-const vec3 burgundy = vec3(0.12, 0.018, 0.055);
-const vec3 magenta = vec3(1.0, 0.08, 0.42);
-const vec3 violet = vec3(0.35, 0.12, 0.65);
+// Fiestron violet palette
+const vec3 black = vec3(0.008, 0.004, 0.018);
+const vec3 deepViolet = vec3(0.045, 0.012, 0.095);
+const vec3 electricViolet = vec3(0.35, 0.12, 0.72);
+const vec3 lavender = vec3(0.55, 0.32, 0.95);
 
 float hash21(vec2 p) {
   p = fract(p * vec2(127.1, 311.7));
@@ -76,13 +77,13 @@ float ridges(vec2 p) {
 }
 
 void main() {
-  // Use absolute pixel mapping scaled by min resolution dimension 
-  // so the pattern tiles seamlessly over tall/long scrollable sections
+  // Maintain the pattern across tall and wide sections
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   float t = uTime * 0.035;
 
-  // Use gl_FragCoord combined with uResolution to maintain full coverage on long pages
-  vec2 normalizedCoord = gl_FragCoord.xy / min(uResolution.x, uResolution.y);
+  vec2 normalizedCoord =
+    gl_FragCoord.xy / min(uResolution.x, uResolution.y);
+
   vec2 p = (normalizedCoord - 0.5) * 3.0;
 
   vec2 q = vec2(
@@ -91,7 +92,10 @@ void main() {
   );
 
   vec2 warped = p + 3.4 * (q - 0.5);
-  float field = ridges(warped + t * vec2(0.12, -0.08));
+
+  float field = ridges(
+    warped + t * vec2(0.12, -0.08)
+  );
 
   float breath = 0.5 + 0.5 * sin(uTime * 0.3);
 
@@ -101,20 +105,36 @@ void main() {
   vec3 color = black;
 
   float body = smoothstep(0.18, 0.48, field);
-  color += burgundy * body * 0.65;
+  color += deepViolet * body * 0.65;
 
-  vec3 undertone = mix(burgundy, violet, 0.35 + 0.15 * breath);
+  // Deep violet undertones
+  vec3 undertone = mix(
+    deepViolet,
+    electricViolet,
+    0.65 + 0.15 * breath
+  );
+
   color += undertone * crest * 0.65;
 
-  vec3 highlight = mix(magenta, violet, 0.35 + 0.2 * sin(field * 8.0));
+  // Electric violet highlights
+  vec3 highlight = mix(
+    lavender,
+    electricViolet,
+    0.65 + 0.15 * sin(field * 8.0)
+  );
+
   color += highlight * crest * (0.12 + 0.12 * breath);
 
-  color = 0.32 * (vec3(1.0) - exp(-color * 2.4 / 0.32));
+  color = 0.32 * (
+    vec3(1.0) - exp(-color * 2.4 / 0.32)
+  );
 
-  // Soft uniform vignette mapped to screen ratio
+  // Soft vignette
   vec2 vignette = (vUv - 0.5) * vec2(aspect, 1.0);
+
   color *= 1.0 - 0.25 * dot(vignette, vignette);
 
+  // Subtle animated grain
   float grain = hash21(
     gl_FragCoord.xy + fract(uTime * 0.31) * 149.0
   ) - 0.5;
@@ -147,9 +167,13 @@ export default function TimelineBackground() {
 
     const gl: WebGLRenderingContext = context;
 
-    function createShader(type: number, source: string): WebGLShader | null {
+    function createShader(
+      type: number,
+      source: string
+    ): WebGLShader | null {
       const shader = gl.createShader(type);
       if (!shader) return null;
+
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
 
@@ -172,6 +196,7 @@ export default function TimelineBackground() {
     }
 
     const program = gl.createProgram();
+
     if (!program) {
       gl.deleteShader(vertex);
       gl.deleteShader(fragment);
@@ -200,6 +225,7 @@ export default function TimelineBackground() {
     ]);
 
     const buffer = gl.createBuffer();
+
     if (!buffer) {
       gl.deleteProgram(program);
       gl.deleteShader(vertex);
@@ -211,24 +237,32 @@ export default function TimelineBackground() {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
     const position = gl.getAttribLocation(program, "position");
+
     gl.enableVertexAttribArray(position);
     gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
     const timeLocation = gl.getUniformLocation(program, "uTime");
-    const resolutionLocation = gl.getUniformLocation(program, "uResolution");
+    const resolutionLocation = gl.getUniformLocation(
+      program,
+      "uResolution"
+    );
 
     let animationFrame = 0;
     let startTime = performance.now();
     let paused = document.hidden;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
 
     function render(now: number) {
       if (paused) return;
+
       const elapsed = (now - startTime) / 1000;
 
       gl.useProgram(program);
       gl.uniform1f(timeLocation, reducedMotion.matches ? 0 : elapsed);
+
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
       if (!reducedMotion.matches) {
@@ -237,9 +271,20 @@ export default function TimelineBackground() {
     }
 
     function resize() {
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
-      const width = Math.max(1, Math.floor(canvas.clientWidth * pixelRatio));
-      const height = Math.max(1, Math.floor(canvas.clientHeight * pixelRatio));
+      const pixelRatio = Math.min(
+        window.devicePixelRatio || 1,
+        1.5
+      );
+
+      const width = Math.max(
+        1,
+        Math.floor(canvas.clientWidth * pixelRatio)
+      );
+
+      const height = Math.max(
+        1,
+        Math.floor(canvas.clientHeight * pixelRatio)
+      );
 
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
@@ -247,6 +292,7 @@ export default function TimelineBackground() {
       }
 
       gl.viewport(0, 0, width, height);
+
       gl.useProgram(program);
       gl.uniform2f(resolutionLocation, width, height);
 
@@ -257,6 +303,7 @@ export default function TimelineBackground() {
 
     function startAnimation() {
       cancelAnimationFrame(animationFrame);
+
       if (paused) return;
 
       if (reducedMotion.matches) {
@@ -269,6 +316,7 @@ export default function TimelineBackground() {
 
     function handleVisibility() {
       paused = document.hidden;
+
       if (paused) {
         cancelAnimationFrame(animationFrame);
       } else {
@@ -284,6 +332,7 @@ export default function TimelineBackground() {
     observer.observe(canvas);
 
     const section = canvas.closest(".timeline-section");
+
     if (section) {
       observer.observe(section);
     }
@@ -291,14 +340,30 @@ export default function TimelineBackground() {
     resize();
     startAnimation();
 
-    document.addEventListener("visibilitychange", handleVisibility);
-    reducedMotion.addEventListener("change", handleMotionChange);
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibility
+    );
+
+    reducedMotion.addEventListener(
+      "change",
+      handleMotionChange
+    );
 
     return () => {
       cancelAnimationFrame(animationFrame);
       observer.disconnect();
-      document.removeEventListener("visibilitychange", handleVisibility);
-      reducedMotion.removeEventListener("change", handleMotionChange);
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility
+      );
+
+      reducedMotion.removeEventListener(
+        "change",
+        handleMotionChange
+      );
+
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
       gl.deleteShader(vertex);

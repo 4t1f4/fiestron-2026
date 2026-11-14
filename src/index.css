@@ -1,81 +1,105 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-
 @import "tailwindcss";
 
 @theme {
---color-bg: #080609;
---color-bg-secondary: #10070D;
---color-maroon: #180710;
---color-burgundy: #2A0B1B;
---color-magenta: #FF2E93;
---color-crimson: #FF1744;
---color-violet: #9D4EDD;
---color-muted: #A99AA5;
---color-white: #F5F0F5;
+  /* Brand Colours */
+  --color-primary: #AF69FF;
+  --color-primary-dark: #7A2FD6;
+  --color-primary-light: #D9B8FF;
+  --color-white: #FFFFFF;
 
---font-heading: "Orbitron", sans-serif;
---font-body: "Space Grotesk", sans-serif;
+  /* Background Colours */
+  --color-bg: #06040A;
+  --color-bg-secondary: #0C0714;
+  --color-plum: #12091F;
+  --color-surface: #1C1030;
+  --color-surface-elevated: #291443;
+
+  /* Accent Colours */
+  --color-electric-violet: #9147FF;
+  --color-neon-orchid: #C77DFF;
+  --color-lavender: #E3CCFF;
+  --color-purple-glow: #BFA0E8;
+
+  /* Neutral Colours */
+  --color-muted: #8A8A99;
+  --color-text-secondary: #C5C1CF;
+
+  /* Typography */
+  --font-heading: "Sora", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
 }
 
 @layer base {
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
-html {
-background: #080609;
-scroll-behavior: auto;
+  html {
+    background: #06040A;
+    scroll-behavior: auto;
+  }
+
+  body {
+    min-height: 100vh;
+    width: 100%;
+    background-color: #06040A;
+    color: #FFFFFF;
+    font-family: "Space Grotesk", sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  a {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    background: #AF69FF;
+    color: #FFFFFF;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #06040A;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #AF69FF;
+    border-radius: 10px;
+  }
 }
 
-body {
-min-height: 100vh;
-width: 100%;
-background-color: #080609;
-color: #F5F0F5;
-font-family: "Space Grotesk", sans-serif;
-overflow-x: hidden;
--webkit-font-smoothing: antialiased;
-}
-
-button,
-a {
-font: inherit;
-}
-
-button {
-cursor: pointer;
-}
-
-a {
-color: inherit;
-text-decoration: none;
-}
-
-img,
-video {
-display: block;
-max-width: 100%;
-}
-
-::selection {
-background: #FF2E93;
-color: #FFFFFF;
-}
-
-::-webkit-scrollbar {
-width: 6px;
-}
-
-::-webkit-scrollbar-track {
-background: #080609;
-}
-
-::-webkit-scrollbar-thumb {
-background: #FF2E93;
-border-radius: 10px;
-}
+/* PHONE: TIMELINE CARD TAP GLOW ONLY */
+@media (hover: none) and (pointer: coarse) {
+  #timeline .group:active {
+    border-color: #AF69FF;
+    box-shadow:
+      0 0 25px rgba(175, 105, 255, 0.38),
+      0 0 55px rgba(145, 71, 255, 0.18),
+      0 12px 35px rgba(175, 105, 255, 0.2);
+  }
 }

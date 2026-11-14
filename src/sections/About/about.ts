@@ -25,6 +25,7 @@ float hash21(vec2 p) {
 float noise(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
+
   vec2 u = f * f * (3.0 - 2.0 * f);
 
   return mix(
@@ -54,7 +55,7 @@ void main() {
   vec2 uv = vUv;
   vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
 
-  // Large flowing organic shapes
+  // Organic movement and flowing distortion
   vec2 warp = vec2(
     fbm(p * 2.0 + vec2(t, -t * 0.6)),
     fbm(p * 2.0 + vec2(4.0, t * 0.5))
@@ -62,44 +63,70 @@ void main() {
 
   vec2 flow = p + (warp - 0.5) * 1.8;
 
+  // Multiple flowing layers
   float layer1 = fbm(flow * 3.0 + t * 0.35);
   float layer2 = fbm(flow * 4.5 - t * 0.25 + 3.0);
   float layer3 = fbm(flow * 2.0 + 7.0);
 
-  // Spread the colour across the entire canvas
+  // Broad colour transitions
   float glow1 = smoothstep(0.25, 0.85, layer1);
   float glow2 = smoothstep(0.35, 0.88, layer2);
   float glow3 = smoothstep(0.30, 0.90, layer3);
 
-  vec3 color = vec3(0.008, 0.005, 0.012);
+  // Fiestron colour palette
+  vec3 cyberBlack = vec3(0.024, 0.016, 0.039);
+  vec3 midnight = vec3(0.047, 0.027, 0.078);
+  vec3 deepPlum = vec3(0.071, 0.035, 0.122);
 
-  color += vec3(0.20, 0.015, 0.075) * glow1 * 1.5;
-  color += vec3(0.48, 0.025, 0.19) * glow2 * 0.8;
-  color += vec3(0.16, 0.055, 0.32) * glow3 * 0.9;
+  vec3 darkViolet = vec3(0.478, 0.184, 0.839);
+  vec3 electricViolet = vec3(0.569, 0.278, 1.000);
+  vec3 primaryViolet = vec3(0.686, 0.412, 1.000);
+  vec3 lavender = vec3(0.851, 0.722, 1.000);
 
-  // Glass-like flowing highlights
-  float folds = sin(flow.x * 7.0 + flow.y * 5.0 + layer1 * 5.0);
+  // Base atmosphere
+  vec3 color = mix(cyberBlack, midnight, glow3 * 0.65);
+
+  // Large visible liquid-like colour regions
+  color = mix(color, deepPlum, glow1 * 0.85);
+  color += darkViolet * glow1 * 0.32;
+  color += electricViolet * glow2 * 0.38;
+  color += primaryViolet * glow3 * 0.20;
+
+  // Flowing glass-like folds
+  float folds = sin(
+    flow.x * 7.0 +
+    flow.y * 5.0 +
+    layer1 * 5.0
+  );
+
   float shine = pow(max(0.0, folds), 9.0);
 
-  color += vec3(0.9, 0.22, 0.52) * shine * 0.15;
+  color += primaryViolet * shine * 0.22;
 
+  // Secondary glossy highlights
   float secondaryShine = pow(
-    max(0.0, sin(flow.y * 9.0 - flow.x * 4.0 + layer2 * 4.0)),
+    max(
+      0.0,
+      sin(flow.y * 9.0 - flow.x * 4.0 + layer2 * 4.0)
+    ),
     12.0
   );
 
-  color += vec3(0.45, 0.25, 0.85) * secondaryShine * 0.13;
+  color += lavender * secondaryShine * 0.18;
 
-  // Soft edge illumination without a dark centre
+  // Soft illuminated edges
   float edgeGlow = smoothstep(0.0, 0.8, length(p));
-  color += vec3(0.10, 0.015, 0.045) * edgeGlow * 0.3;
 
-  // Gentle vignette
+  color += darkViolet * edgeGlow * 0.12;
+
+  // Subtle depth and vignette
   float vignette = 1.0 - 0.22 * dot(p, p);
+
   color *= clamp(vignette, 0.65, 1.0);
 
-  // Subtle grain
+  // Fine atmospheric grain
   float grain = hash21(gl_FragCoord.xy + fract(uTime) * 100.0) - 0.5;
+
   color += grain * 0.008;
 
   gl_FragColor = vec4(color, 1.0);
@@ -110,14 +137,13 @@ export function initAbout(
   section: HTMLElement,
   canvas: HTMLCanvasElement
 ) {
-  // Initialize WebGL
   const context = canvas.getContext("webgl", {
     alpha: false,
     antialias: false,
     powerPreference: "default",
   });
 
-  if (context === null) {
+  if (!context) {
     console.error("Unable to initialize WebGL.");
     return;
   }
@@ -133,14 +159,14 @@ export function initAbout(
     "(prefers-reduced-motion: reduce)"
   );
 
-  // Compile shaders
+  // Compile a shader and report errors if compilation fails.
   function createShader(
     type: number,
     source: string
   ): WebGLShader | null {
     const shader = gl.createShader(type);
 
-    if (shader === null) return null;
+    if (!shader) return null;
 
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -157,16 +183,16 @@ export function initAbout(
   const vertex = createShader(gl.VERTEX_SHADER, vertexShader);
   const fragment = createShader(gl.FRAGMENT_SHADER, fragmentShader);
 
-  if (vertex === null || fragment === null) {
+  if (!vertex || !fragment) {
     if (vertex) gl.deleteShader(vertex);
     if (fragment) gl.deleteShader(fragment);
     return;
   }
 
-  // Create program
+  // Link both shaders into one WebGL program.
   const program = gl.createProgram();
 
-  if (program === null) {
+  if (!program) {
     gl.deleteShader(vertex);
     gl.deleteShader(fragment);
     return;
@@ -187,7 +213,7 @@ export function initAbout(
 
   gl.useProgram(program);
 
-  // Fullscreen geometry
+  // Fullscreen quad
   const vertices = new Float32Array([
     -1, -1,
      1, -1,
@@ -197,7 +223,7 @@ export function initAbout(
 
   const buffer = gl.createBuffer();
 
-  if (buffer === null) {
+  if (!buffer) {
     gl.deleteProgram(program);
     gl.deleteShader(vertex);
     gl.deleteShader(fragment);
@@ -231,7 +257,7 @@ export function initAbout(
     return;
   }
 
-  // Resize
+  // Match the canvas resolution to the About section.
   function resize() {
     if (disposed) return;
 
@@ -260,7 +286,7 @@ export function initAbout(
     }
   }
 
-  // Render
+  // Draw the background.
   function render(now: number) {
     if (disposed || gl.isContextLost()) return;
 
@@ -274,7 +300,7 @@ export function initAbout(
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  // Animation
+  // Keep the liquid shapes moving smoothly.
   function animate(now: number) {
     if (disposed || paused || reducedMotion.matches) return;
 
@@ -297,7 +323,7 @@ export function initAbout(
     animationFrame = requestAnimationFrame(animate);
   }
 
-  // Visibility
+  // Pause the animation when the tab is not visible.
   function handleVisibility() {
     paused = document.hidden;
 
@@ -308,7 +334,6 @@ export function initAbout(
     }
   }
 
-  // Motion preference
   function handleMotionChange() {
     cancelAnimationFrame(animationFrame);
     startAnimation();
@@ -320,13 +345,12 @@ export function initAbout(
 
   window.addEventListener("resize", resize);
   document.addEventListener("visibilitychange", handleVisibility);
-
   reducedMotion.addEventListener("change", handleMotionChange);
 
   resize();
   startAnimation();
 
-  // Cleanup
+  // Release WebGL resources when About unmounts.
   return () => {
     disposed = true;
 
@@ -335,7 +359,6 @@ export function initAbout(
 
     window.removeEventListener("resize", resize);
     document.removeEventListener("visibilitychange", handleVisibility);
-
     reducedMotion.removeEventListener("change", handleMotionChange);
 
     gl.deleteBuffer(buffer);

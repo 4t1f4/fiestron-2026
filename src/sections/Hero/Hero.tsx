@@ -29,13 +29,15 @@ export default function Hero() {
       className="
         relative isolate flex min-h-svh w-full
         items-center justify-center overflow-hidden
-        bg-[radial-gradient(ellipse_at_50%_48%,rgba(91,12,48,0.28),transparent_55%),#080609]
+        bg-[radial-gradient(ellipse_at_50%_48%,rgba(145,71,255,0.20),transparent_55%),#06040A]
       "
     >
       {/* Main hero content */}
+
       <div className="relative z-[1] flex w-full flex-col items-center px-6 py-[8rem] text-center">
 
         {/* Particle title area */}
+
         <div
           className="
             relative isolate
@@ -44,7 +46,9 @@ export default function Hero() {
             py-[2.5rem]
           "
         >
+
           {/* Background particles */}
+
           <canvas
             ref={backgroundCanvasRef}
             id="background-particles"
@@ -55,23 +59,25 @@ export default function Hero() {
           <div className="relative z-[1] flex flex-col items-center text-center">
 
             {/* Eyebrow */}
+
             <p
               className="
                 mb-4 flex items-center gap-4
                 text-[0.7rem] font-semibold tracking-[0.35em]
-                text-[#A99AA5]
+                text-[#C5C1CF]
                 max-[700px]:text-[0.55rem]
                 max-[700px]:tracking-[0.2em]
               "
             >
-              <span className="h-px w-[35px] bg-[#FF2E93] opacity-70 max-[700px]:w-5" />
+              <span className="h-px w-[35px] bg-[#AF69FF] opacity-70 max-[700px]:w-5" />
 
               TECH CLUB PRESENTS
 
-              <span className="h-px w-[35px] bg-[#FF2E93] opacity-70 max-[700px]:w-5" />
+              <span className="h-px w-[35px] bg-[#AF69FF] opacity-70 max-[700px]:w-5" />
             </p>
 
             {/* Particle typography */}
+
             <div
               className="
                 relative aspect-[3.2/1] w-full max-w-[1200px]
@@ -87,11 +93,12 @@ export default function Hero() {
 
               <h1 className="sr-only">FIESTRON</h1>
             </div>
+
           </div>
         </div>
 
-
         {/* CTA and DEJA VU theme card */}
+
         <div className="hero-cta-wrapper">
 
           <div
@@ -135,6 +142,7 @@ export default function Hero() {
             }}
           >
             <span className="hero-cta-text">ENTER THE LOOP</span>
+
             <span className="hero-cta-arrow" aria-hidden="true">
               ↗
             </span>

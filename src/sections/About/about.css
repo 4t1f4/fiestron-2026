@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+
+
 /* TERMINAL LINE NUMBERS */
 
 .code-body code {
@@ -21,8 +24,7 @@
   user-select: none;
 }
 
-/* MOBILE LINE NUMBERS */
-
+/* Give the line numbers a little more room on smaller screens. */
 @media (max-width: 768px) {
   .code-line::before {
     width: 2rem;
@@ -31,11 +33,12 @@
   }
 }
 
-/* BLINKING TERMINAL CURSOR */
+
+/* TERMINAL CURSOR */
 
 .token-cursor {
   display: inline-block;
-  color: #FF2E93;
+  color: #AF69FF;
   margin-left: 2px;
   animation: blink 0.8s step-start infinite;
 }
@@ -52,6 +55,9 @@
   }
 }
 
+
+/* BACKGROUND CANVAS */
+
 .about-canvas {
   position: absolute;
   inset: 0;
@@ -60,4 +66,293 @@
   display: block;
   pointer-events: none;
   z-index: 0;
+}
+
+/* A faint grid adds a little technical texture without taking over. */
+.about-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(rgba(175, 105, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(175, 105, 255, 0.05) 1px, transparent 1px);
+
+  background-size: 56px 56px;
+
+  -webkit-mask-image: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.35) 45%,
+    transparent 75%
+  );
+
+  mask-image: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.35) 45%,
+    transparent 75%
+  );
+}
+
+
+/* ABOUT TYPOGRAPHY */
+
+.about-eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #BFA0E8;
+}
+
+.about-title {
+  font-family: "Sora", "Space Grotesk", sans-serif;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+  color: #FFFFFF;
+  text-shadow: 0 0 32px rgba(175, 105, 255, 0.22);
+}
+
+.about-lede {
+  font-family: "Space Grotesk", sans-serif;
+  color: rgba(227, 204, 255, 0.72);
+}
+
+@media (max-width: 768px) {
+  .about-eyebrow {
+    font-size: 0.64rem;
+    letter-spacing: 0.24em;
+  }
+}
+
+
+/* BUTTON WRAPPERS */
+
+.about-btn-wrap {
+  display: inline-flex;
+  filter: drop-shadow(0 0 0 rgba(175, 105, 255, 0));
+  transition:
+    filter 0.35s ease,
+    transform 0.35s ease;
+}
+
+.about-btn-wrap--primary {
+  filter: drop-shadow(0 0 10px rgba(175, 105, 255, 0.3));
+}
+
+.about-btn-wrap:hover {
+  transform: translateY(-3px);
+}
+
+.about-btn-wrap--primary:hover {
+  filter: drop-shadow(0 0 18px rgba(175, 105, 255, 0.55));
+}
+
+.about-btn-wrap--secondary:hover {
+  filter: drop-shadow(0 0 12px rgba(175, 105, 255, 0.25));
+}
+
+/* Keep keyboard focus visible even though the buttons use clipped shapes. */
+.about-btn-wrap:focus-within {
+  filter:
+    drop-shadow(0 0 1px #FFFFFF)
+    drop-shadow(0 0 10px rgba(175, 105, 255, 0.9));
+}
+
+
+/* SHARED BUTTON STYLING */
+
+.about-btn {
+  --cut: 14px;
+  --cut-in: calc(var(--cut) - 0.6px);
+  --border: rgba(175, 105, 255, 0.5);
+  --surface: #12091F;
+
+  position: relative;
+  isolation: isolate;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  min-height: 52px;
+  padding: 0 1.9rem;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+
+  text-decoration: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The outer layer creates the angled border. */
+.about-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: var(--border);
+  transition: background 0.3s ease;
+}
+
+/* The inner layer creates the button surface. */
+.about-btn::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+/* This layer carries the animated highlight on hover. */
+.about-btn-sheen {
+  position: absolute;
+  inset: 1px;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.about-btn-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-btn-label,
+.about-btn-arrow {
+  position: relative;
+  z-index: 1;
+}
+
+.about-btn-arrow {
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* PRIMARY BUTTON */
+
+.about-btn--primary {
+  --border: #D9B8FF;
+  --surface: #AF69FF;
+
+  color: #06040A;
+
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+}
+
+.about-btn--primary::after,
+.about-btn--primary .about-btn-sheen {
+  clip-path: polygon(
+    var(--cut-in) 0,
+    100% 0,
+    100% calc(100% - var(--cut-in)),
+    calc(100% - var(--cut-in)) 100%,
+    0 100%,
+    0 var(--cut-in)
+  );
+}
+
+/* Soft lavender replaces the harsh white hover flash. */
+.about-btn--primary .about-btn-sheen::before {
+  background: #D9B8FF;
+  transform: translateX(-101%);
+}
+
+.about-btn--primary:hover .about-btn-sheen::before,
+.about-btn--primary:focus-visible .about-btn-sheen::before {
+  transform: translateX(0);
+}
+
+.about-btn--primary:hover .about-btn-arrow,
+.about-btn--primary:focus-visible .about-btn-arrow {
+  transform: translate(4px, -4px);
+}
+
+
+/* SECONDARY BUTTON */
+
+.about-btn--secondary {
+  --cut: 12px;
+
+  color: #E3CCFF;
+
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+}
+
+.about-btn--secondary::after,
+.about-btn--secondary .about-btn-sheen {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut-in)) 0,
+    100% var(--cut-in),
+    100% 100%,
+    var(--cut-in) 100%,
+    0 calc(100% - var(--cut-in))
+  );
+}
+
+.about-btn--secondary .about-btn-sheen::before {
+  background: rgba(175, 105, 255, 0.20);
+  transform: translateX(101%);
+}
+
+.about-btn--secondary:hover,
+.about-btn--secondary:focus-visible {
+  --border: #D9B8FF;
+  color: #E3CCFF;
+}
+
+.about-btn--secondary:hover .about-btn-sheen::before,
+.about-btn--secondary:focus-visible .about-btn-sheen::before {
+  transform: translateX(0);
+}
+
+
+/* Keep buttons comfortable to tap on smaller phones. */
+@media (max-width: 420px) {
+  .about-btn {
+    min-height: 48px;
+    padding: 0 1.3rem;
+    font-size: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-btn-wrap,
+  .about-btn::before,
+  .about-btn-sheen::before,
+  .about-btn-arrow {
+    transition: none;
+  }
+
+  .about-btn-wrap:hover {
+    transform: none;
+  }
 }
