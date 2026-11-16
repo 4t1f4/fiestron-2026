@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 // Intro
 import Intro from "./components/Intro/Intro";
@@ -8,6 +8,7 @@ import CustomCursor from "./components/CustomCursor/CustomCursor";
 import Navbar from "./components/Navbar/Navbar";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import Footer from "./components/Footer/Footer";
+import Chatbot from "./components/Chatbot/Chatbot";
 
 // Home Sections
 import Hero from "./sections/Hero/Hero.tsx";
@@ -29,12 +30,21 @@ function Home() {
   );
 }
 
+// Show chatbot everywhere except the Intro Tunnel.
+function GlobalChatbot() {
+  const location = useLocation();
+
+  if (location.pathname === "/") return null;
+
+  return <Chatbot />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-
       <CustomCursor />
+      <GlobalChatbot />
 
       <Routes>
         <Route path="/" element={<Intro />} />
