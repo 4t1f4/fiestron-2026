@@ -37,7 +37,7 @@ export const fiestronChatFlow = ai.defineFlow(
       .join('\n');
 
     const { text } = await ai.generate({
-      model: googleAI.model('gemini-3.5-flash'),
+      model: googleAI.model('gemini-3.5-flash-lite'),
 
       system: `
 You are the official AI assistant for FIESTRON 2026,
