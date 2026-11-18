@@ -17,11 +17,12 @@ varying vec2 vUv;
 uniform float uTime;
 uniform vec2 uResolution;
 
-// Fiestron violet palette
-const vec3 black = vec3(0.008, 0.004, 0.018);
-const vec3 deepViolet = vec3(0.045, 0.012, 0.095);
-const vec3 electricViolet = vec3(0.35, 0.12, 0.72);
-const vec3 lavender = vec3(0.55, 0.32, 0.95);
+// Fiestron palette (brand hex values converted to 0..1)
+const vec3 cyberBlack = vec3(0.024, 0.016, 0.039); // #06040A
+const vec3 deepPlum   = vec3(0.071, 0.035, 0.122); // #12091F
+const vec3 darkViolet = vec3(0.478, 0.184, 0.839); // #7A2FD6
+const vec3 primary    = vec3(0.686, 0.412, 1.000); // #AF69FF
+const vec3 lavender   = vec3(0.851, 0.722, 1.000); // #D9B8FF
 
 float hash21(vec2 p) {
   p = fract(p * vec2(127.1, 311.7));
@@ -99,35 +100,28 @@ void main() {
 
   float breath = 0.5 + 0.5 * sin(uTime * 0.3);
 
+  float body = smoothstep(0.18, 0.48, field);
+
   float crest = smoothstep(0.42, 0.68, field);
   crest *= crest;
 
-  vec3 color = black;
+  // Start from the section's own cyber black and lift gently to deep plum
+  vec3 color = cyberBlack;
+  color += (deepPlum - cyberBlack) * body;
 
-  float body = smoothstep(0.18, 0.48, field);
-  color += deepViolet * body * 0.65;
+  // Violet body of the ridges. Blue stays the dominant channel,
+  // which is what keeps this violet instead of drifting toward pink.
+  color += darkViolet * crest * (0.16 + 0.04 * breath);
 
-  // Deep violet undertones
-  vec3 undertone = mix(
-    deepViolet,
-    electricViolet,
-    0.65 + 0.15 * breath
-  );
+  // Brighter violet and white-lavender only on the very crests
+  color += primary * crest * crest * 0.07;
+  color += lavender * pow(crest, 4.0) * 0.05;
 
-  color += undertone * crest * 0.65;
-
-  // Electric violet highlights
-  vec3 highlight = mix(
-    lavender,
-    electricViolet,
-    0.65 + 0.15 * sin(field * 8.0)
-  );
-
-  color += highlight * crest * (0.12 + 0.12 * breath);
-
-  color = 0.32 * (
-    vec3(1.0) - exp(-color * 2.4 / 0.32)
-  );
+  // Hue-preserving soft limit: scale all channels together
+  // (a per-channel curve would squash blue and push the hue toward pink).
+  float peak = max(color.r, max(color.g, color.b));
+  float limited = 0.6 * (1.0 - exp(-peak / 0.6));
+  color *= limited / max(peak, 0.0001);
 
   // Soft vignette
   vec2 vignette = (vUv - 0.5) * vec2(aspect, 1.0);
