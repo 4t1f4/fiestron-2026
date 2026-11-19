@@ -323,25 +323,26 @@
 
 /* GIANT FIESTRON DISPLAY WORDMARK */
 .footer-giant-wordmark {
-  margin: 22px 0 10px;
+  position: relative;
+  margin: 24px 0 12px;
   text-align: center;
-  font-family: "Orbitron", "Sora", sans-serif;
-  font-size: clamp(3.1rem, 11.5vw, 9.2rem);
-  font-weight: 900;
+  font-family: "Chakra Petch", "Orbitron", "Sora", sans-serif;
+  font-size: clamp(2.8rem, 11.2vw, 9rem);
+  font-weight: 700;
   letter-spacing: 0.14em;
-  line-height: 0.92;
+  line-height: 0.94;
   user-select: none;
   background: linear-gradient(
     180deg,
     #FFFFFF 0%,
-    #D4A5FF 42%,
-    #AF69FF 72%,
-    rgba(175, 105, 255, 0.08) 100%
+    #FFFFFF 48%,
+    #C89CFF 66%,
+    rgba(25, 16, 42, 0.55) 86%,
+    #06040A 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 0 28px rgba(175, 105, 255, 0.16));
 }
 
 /* BOTTOM BAR */
