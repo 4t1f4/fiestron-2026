@@ -1,23 +1,23 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 // Intro
-import Intro from "./components/Intro/Intro";
+import Intro from "./components/Intro/Intro.tsx";
 
 // Global Components
-import CustomCursor from "./components/CustomCursor/CustomCursor";
-import Navbar from "./components/Navbar/Navbar";
-import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
-import Footer from "./components/Footer/Footer";
-import Chatbot from "./components/Chatbot/Chatbot";
+import CustomCursor from "./components/CustomCursor/CustomCursor.tsx";
+import Navbar from "./components/Navbar/Navbar.tsx";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop.tsx";
+import Footer from "./components/Footer/Footer.tsx";
+import Chatbot from "./components/Chatbot/Chatbot.tsx";
 
 // Home Sections
 import Hero from "./sections/Hero/Hero.tsx";
 import About from "./sections/About/About.tsx";
 // import Events from "./sections/Events/Events";
-import Timeline from "./sections/Timeline/Timeline";
+import Timeline from "./sections/Timeline/Timeline.tsx";
 
 // Pages
-import Council from "./pages/Council/Council";
+import Council from "./pages/Council/Council.tsx";
 
 function Home() {
   return (
