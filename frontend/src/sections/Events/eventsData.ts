@@ -3,6 +3,7 @@ export interface FestEvent {
   number: string;
   name: string;
   category: string;
+  categoryPill?: string;
   format: string;
   tagline: string;
   description: string;
@@ -14,10 +15,12 @@ export interface FestEvent {
   fee: number | null;
   prizePool: string;
   registerUrl?: string;
+  rulesUrl?: string;
   images: [string, string, string];
 }
 
 export const REGISTRATION_URL = "#register";
+export const RULES_URL = "#rules";
 
 export const EVENTS: FestEvent[] = [
   {
@@ -25,6 +28,7 @@ export const EVENTS: FestEvent[] = [
     number: "01",
     name: "Code Paradox",
     category: "TECHNICAL",
+    categoryPill: "TECHNICAL EVENT",
     format: "INDIVIDUAL OR DUO · TIMED SPRINT",
     tagline: "Patch yesterday's bugs before tomorrow's loop closes.",
     description:
@@ -36,6 +40,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "1 – 2 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=900&q=85",
@@ -47,6 +53,7 @@ export const EVENTS: FestEvent[] = [
     number: "02",
     name: "Glitch Arena",
     category: "GAMING",
+    categoryPill: "GAMING EVENT",
     format: "SQUAD & SOLO BRACKETS · LIVE PLAY",
     tagline: "Every frame matters when the rules bend mid-match.",
     description:
@@ -58,6 +65,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "1 – 5 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=900&q=85",
@@ -69,6 +78,7 @@ export const EVENTS: FestEvent[] = [
     number: "03",
     name: "Chrono Frame",
     category: "CREATIVE",
+    categoryPill: "NON-TECHNICAL EVENT",
     format: "SOLO OR CREW · VISUAL STORYTELLING",
     tagline: "Freeze a memory from the past and render it for the future.",
     description:
@@ -80,6 +90,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "1 – 3 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=900&q=85",
@@ -91,6 +103,7 @@ export const EVENTS: FestEvent[] = [
     number: "04",
     name: "Deja Hack",
     category: "HACKATHON",
+    categoryPill: "TECHNICAL EVENT",
     format: "TEAM BUILD · RAPID PROTOTYPING",
     tagline: "Ship a working idea—then rewire it when the prompt shifts.",
     description:
@@ -102,6 +115,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "2 – 4 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=85",
@@ -113,6 +128,7 @@ export const EVENTS: FestEvent[] = [
     number: "05",
     name: "Reality Shift",
     category: "AI & AR",
+    categoryPill: "TECHNICAL EVENT",
     format: "SOLO OR TRIO · INTERACTIVE LAB",
     tagline: "Blur the line between screen, lens, and physical space.",
     description:
@@ -124,6 +140,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "1 – 3 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=85",
@@ -135,6 +153,7 @@ export const EVENTS: FestEvent[] = [
     number: "06",
     name: "UI Loop Lab",
     category: "DESIGN",
+    categoryPill: "NON-TECHNICAL EVENT",
     format: "SOLO OR DUO · INTERFACE CHALLENGE",
     tagline: "Design motion and hierarchy that feel effortless on first touch.",
     description:
@@ -146,6 +165,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "1 – 2 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=900&q=85",
@@ -157,6 +178,7 @@ export const EVENTS: FestEvent[] = [
     number: "07",
     name: "Cipher Quest",
     category: "TECHNICAL",
+    categoryPill: "TECHNICAL EVENT",
     format: "SOLO OR TRIO · INVESTIGATION",
     tagline: "Follow the signal through layers of clues and hidden logic.",
     description:
@@ -168,6 +190,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "1 – 3 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=900&q=85",
@@ -179,6 +203,7 @@ export const EVENTS: FestEvent[] = [
     number: "08",
     name: "Replay Rush",
     category: "FUN",
+    categoryPill: "CARNIVAL EVENT",
     format: "SQUAD CHALLENGE · FAST ROUNDS",
     tagline: "High energy, quick pivots, and instant replay moments.",
     description:
@@ -190,6 +215,8 @@ export const EVENTS: FestEvent[] = [
     teamSize: "2 – 4 Members",
     fee: null,
     prizePool: "TBD",
+    registerUrl: REGISTRATION_URL,
+    rulesUrl: RULES_URL,
     images: [
       "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=900&q=85",
       "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=900&q=85",

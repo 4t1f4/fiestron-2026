@@ -42,7 +42,6 @@ import {
   useTransform,
 } from "framer-motion";
 
-import TimelineBackground from "./TimelineBackground";
 
 import {
   timelineEvents,
@@ -300,11 +299,11 @@ export default function Timeline() {
   return (
     <section
       id="timeline"
-      className="relative isolate w-full overflow-hidden bg-[#06040A] px-5 py-28 sm:px-8 lg:px-12 2xl:px-16"
+      className="timeline-section relative isolate w-full overflow-hidden bg-transparent px-5 py-28 sm:px-8 lg:px-12 2xl:px-16"
     >
-      <TimelineBackground />
+      
 
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[#06040A]/20" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-transparent" />
 
       <div className="relative z-10 mx-auto w-full max-w-[1100px]">
 

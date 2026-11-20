@@ -17,12 +17,11 @@ varying vec2 vUv;
 uniform float uTime;
 uniform vec2 uResolution;
 
-// Fiestron palette (brand hex values converted to 0..1)
-const vec3 cyberBlack = vec3(0.024, 0.016, 0.039); // #06040A
-const vec3 deepPlum   = vec3(0.071, 0.035, 0.122); // #12091F
-const vec3 darkViolet = vec3(0.478, 0.184, 0.839); // #7A2FD6
-const vec3 primary    = vec3(0.686, 0.412, 1.000); // #AF69FF
-const vec3 lavender   = vec3(0.851, 0.722, 1.000); // #D9B8FF
+const vec3 cyberBlack = vec3(0.024, 0.016, 0.039);
+const vec3 deepPlum = vec3(0.071, 0.035, 0.122);
+const vec3 darkViolet = vec3(0.478, 0.184, 0.839);
+const vec3 primary = vec3(0.686, 0.412, 1.000);
+const vec3 lavender = vec3(0.851, 0.722, 1.000);
 
 float hash21(vec2 p) {
   p = fract(p * vec2(127.1, 311.7));
@@ -78,7 +77,6 @@ float ridges(vec2 p) {
 }
 
 void main() {
-  // Maintain the pattern across tall and wide sections
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   float t = uTime * 0.035;
 
@@ -105,30 +103,22 @@ void main() {
   float crest = smoothstep(0.42, 0.68, field);
   crest *= crest;
 
-  // Start from the section's own cyber black and lift gently to deep plum
   vec3 color = cyberBlack;
   color += (deepPlum - cyberBlack) * body;
 
-  // Violet body of the ridges. Blue stays the dominant channel,
-  // which is what keeps this violet instead of drifting toward pink.
   color += darkViolet * crest * (0.16 + 0.04 * breath);
 
-  // Brighter violet and white-lavender only on the very crests
   color += primary * crest * crest * 0.07;
   color += lavender * pow(crest, 4.0) * 0.05;
 
-  // Hue-preserving soft limit: scale all channels together
-  // (a per-channel curve would squash blue and push the hue toward pink).
   float peak = max(color.r, max(color.g, color.b));
   float limited = 0.6 * (1.0 - exp(-peak / 0.6));
   color *= limited / max(peak, 0.0001);
 
-  // Soft vignette
   vec2 vignette = (vUv - 0.5) * vec2(aspect, 1.0);
 
   color *= 1.0 - 0.25 * dot(vignette, vignette);
 
-  // Subtle animated grain
   float grain = hash21(
     gl_FragCoord.xy + fract(uTime * 0.31) * 149.0
   ) - 0.5;
@@ -139,77 +129,80 @@ void main() {
 }
 `;
 
-export default function TimelineBackground() {
+export default function EventsTimelineBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvasElement = canvasRef.current;
-    if (!canvasElement) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const canvas: HTMLCanvasElement = canvasElement;
+    const canvasEl: HTMLCanvasElement = canvas;
 
-    const context = canvas.getContext("webgl", {
+    const gl = canvasEl.getContext("webgl", {
       alpha: false,
       antialias: false,
       powerPreference: "low-power",
     });
 
-    if (!context) {
+    if (!gl) {
       console.error("WebGL is not supported.");
       return;
     }
 
-    const gl: WebGLRenderingContext = context;
+    const context: WebGLRenderingContext = gl;
 
     function createShader(
       type: number,
       source: string
     ): WebGLShader | null {
-      const shader = gl.createShader(type);
+      const shader = context.createShader(type);
+
       if (!shader) return null;
 
-      gl.shaderSource(shader, source);
-      gl.compileShader(shader);
+      context.shaderSource(shader, source);
+      context.compileShader(shader);
 
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
+      if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
+        console.error(context.getShaderInfoLog(shader));
+        context.deleteShader(shader);
         return null;
       }
 
       return shader;
     }
 
-    const vertex = createShader(gl.VERTEX_SHADER, vertexShader);
-    const fragment = createShader(gl.FRAGMENT_SHADER, fragmentShader);
+    const vertex = createShader(context.VERTEX_SHADER, vertexShader);
+    const fragment = createShader(context.FRAGMENT_SHADER, fragmentShader);
 
     if (!vertex || !fragment) {
-      if (vertex) gl.deleteShader(vertex);
-      if (fragment) gl.deleteShader(fragment);
+      if (vertex) context.deleteShader(vertex);
+      if (fragment) context.deleteShader(fragment);
       return;
     }
 
-    const program = gl.createProgram();
+    const program = context.createProgram();
 
     if (!program) {
-      gl.deleteShader(vertex);
-      gl.deleteShader(fragment);
+      context.deleteShader(vertex);
+      context.deleteShader(fragment);
       return;
     }
 
-    gl.attachShader(program, vertex);
-    gl.attachShader(program, fragment);
-    gl.linkProgram(program);
+    context.attachShader(program, vertex);
+    context.attachShader(program, fragment);
+    context.linkProgram(program);
 
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error(gl.getProgramInfoLog(program));
-      gl.deleteProgram(program);
-      gl.deleteShader(vertex);
-      gl.deleteShader(fragment);
+    if (!context.getProgramParameter(program, context.LINK_STATUS)) {
+      console.error(context.getProgramInfoLog(program));
+
+      context.deleteProgram(program);
+      context.deleteShader(vertex);
+      context.deleteShader(fragment);
+
       return;
     }
 
-    gl.useProgram(program);
+    context.useProgram(program);
 
     const vertices = new Float32Array([
       -1, -1,
@@ -218,25 +211,25 @@ export default function TimelineBackground() {
        1,  1,
     ]);
 
-    const buffer = gl.createBuffer();
+    const buffer = context.createBuffer();
 
     if (!buffer) {
-      gl.deleteProgram(program);
-      gl.deleteShader(vertex);
-      gl.deleteShader(fragment);
+      context.deleteProgram(program);
+      context.deleteShader(vertex);
+      context.deleteShader(fragment);
       return;
     }
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    context.bindBuffer(context.ARRAY_BUFFER, buffer);
+    context.bufferData(context.ARRAY_BUFFER, vertices, context.STATIC_DRAW);
 
-    const position = gl.getAttribLocation(program, "position");
+    const position = context.getAttribLocation(program, "position");
 
-    gl.enableVertexAttribArray(position);
-    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+    context.enableVertexAttribArray(position);
+    context.vertexAttribPointer(position, 2, context.FLOAT, false, 0, 0);
 
-    const timeLocation = gl.getUniformLocation(program, "uTime");
-    const resolutionLocation = gl.getUniformLocation(
+    const timeLocation = context.getUniformLocation(program, "uTime");
+    const resolutionLocation = context.getUniformLocation(
       program,
       "uResolution"
     );
@@ -254,10 +247,14 @@ export default function TimelineBackground() {
 
       const elapsed = (now - startTime) / 1000;
 
-      gl.useProgram(program);
-      gl.uniform1f(timeLocation, reducedMotion.matches ? 0 : elapsed);
+      context.useProgram(program);
 
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      context.uniform1f(
+        timeLocation,
+        reducedMotion.matches ? 0 : elapsed
+      );
+
+      context.drawArrays(context.TRIANGLE_STRIP, 0, 4);
 
       if (!reducedMotion.matches) {
         animationFrame = requestAnimationFrame(render);
@@ -272,23 +269,23 @@ export default function TimelineBackground() {
 
       const width = Math.max(
         1,
-        Math.floor(canvas.clientWidth * pixelRatio)
+        Math.floor(canvasEl.clientWidth * pixelRatio)
       );
 
       const height = Math.max(
         1,
-        Math.floor(canvas.clientHeight * pixelRatio)
+        Math.floor(canvasEl.clientHeight * pixelRatio)
       );
 
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
+      if (canvasEl.width !== width || canvasEl.height !== height) {
+        canvasEl.width = width;
+        canvasEl.height = height;
       }
 
-      gl.viewport(0, 0, width, height);
+      context.viewport(0, 0, width, height);
 
-      gl.useProgram(program);
-      gl.uniform2f(resolutionLocation, width, height);
+      context.useProgram(program);
+      context.uniform2f(resolutionLocation, width, height);
 
       if (reducedMotion.matches && !paused) {
         render(performance.now());
@@ -323,13 +320,7 @@ export default function TimelineBackground() {
     }
 
     const observer = new ResizeObserver(resize);
-    observer.observe(canvas);
-
-    const section = canvas.closest(".timeline-section");
-
-    if (section) {
-      observer.observe(section);
-    }
+    observer.observe(canvasEl);
 
     resize();
     startAnimation();
@@ -358,10 +349,10 @@ export default function TimelineBackground() {
         handleMotionChange
       );
 
-      gl.deleteBuffer(buffer);
-      gl.deleteProgram(program);
-      gl.deleteShader(vertex);
-      gl.deleteShader(fragment);
+      context.deleteBuffer(buffer);
+      context.deleteProgram(program);
+      context.deleteShader(vertex);
+      context.deleteShader(fragment);
     };
   }, []);
 

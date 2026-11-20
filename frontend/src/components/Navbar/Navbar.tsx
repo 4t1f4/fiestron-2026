@@ -5,8 +5,8 @@ import "./navbar.css";
 const navItems = [
 { label: "ABOUT", href: "#about", id: "about" },
 { label: "COUNCIL", href: "/council", id: "council" },
-{ label: "TIMELINE", href: "#timeline", id: "timeline" },
 { label: "EVENTS", href: "#events", id: "events" },
+{ label: "TIMELINE", href: "#timeline", id: "timeline" },
 { label: "SPONSORS", href: "#sponsors", id: "sponsors" },
 { label: "CONTACT", href: "#contact", id: "contact" },
 ];
