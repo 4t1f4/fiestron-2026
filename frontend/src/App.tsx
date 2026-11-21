@@ -8,7 +8,7 @@ import {
 // Intro
 import Intro from "./components/Intro/Intro.tsx";
 
-// Global Components
+// Global components
 import CustomCursor from "./components/CustomCursor/CustomCursor.tsx";
 import Navbar from "./components/Navbar/Navbar.tsx";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop.tsx";
@@ -18,14 +18,16 @@ import Chatbot from "./components/Chatbot/Chatbot.tsx";
 // Backgrounds
 import EventsTimelineBackground from "./components/Backgrounds/EventsTimelineBackground.tsx";
 
-// Home Sections
+// Home sections
 import Hero from "./sections/Hero/Hero.tsx";
 import About from "./sections/About/About.tsx";
 import Events from "./sections/Events/Events.tsx";
 import Timeline from "./sections/Timeline/Timeline.tsx";
+import Faq from "./sections/Faq/Faq.tsx";
 
 // Pages
 import Council from "./pages/Council/Council.tsx";
+import Message from "./pages/Message/Message.tsx";
 
 function Home() {
   return (
@@ -33,24 +35,27 @@ function Home() {
       <Hero />
       <About />
 
-      {/* Shared Events + Timeline Background */}
+      {/* The same shared background continues behind these sections */}
       <div className="events-timeline-wrapper">
         <EventsTimelineBackground />
 
         <div className="events-timeline-content">
           <Events />
           <Timeline />
+          <Faq />
         </div>
       </div>
     </main>
   );
 }
 
-// Show chatbot everywhere except the Intro Tunnel.
+// Keep the chatbot away from the intro tunnel and dedicated message page.
 function GlobalChatbot() {
   const location = useLocation();
 
-  if (location.pathname === "/") return null;
+  if (location.pathname === "/" || location.pathname === "/message") {
+    return null;
+  }
 
   return <Chatbot />;
 }
@@ -63,8 +68,11 @@ export default function App() {
       <GlobalChatbot />
 
       <Routes>
+
+        {/* Intro tunnel */}
         <Route path="/" element={<Intro />} />
 
+        {/* Main website */}
         <Route
           path="/home"
           element={
@@ -76,6 +84,7 @@ export default function App() {
           }
         />
 
+        {/* Council page */}
         <Route
           path="/council"
           element={
@@ -86,6 +95,13 @@ export default function App() {
             </>
           }
         />
+
+        {/* Standalone contact page: no Navbar or Footer */}
+        <Route
+          path="/message"
+          element={<Message />}
+        />
+
       </Routes>
     </BrowserRouter>
   );
