@@ -1,5 +1,7 @@
 import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { Link } from "react-router-dom";
+import emailjs from "@emailjs/browser";
 
 import {
   ArrowLeft,
@@ -26,29 +28,70 @@ export default function Message() {
     message: "",
   });
 
+  const [isSending, setIsSending] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+
+    // Clear the previous status when the visitor edits the form.
+    setStatusMessage("");
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Prepare the message and open the visitor's email application.
-    const body = `Name: ${formData.name}
-Email: ${formData.email}
+    if (isSending) return;
 
-${formData.message}`;
+    setIsSending(true);
+    setStatusMessage("");
 
-    const mailtoLink = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-      formData.subject
-    )}&body=${encodeURIComponent(body)}`;
+    try {
+      // Send the form details through EmailJS.
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        {
+          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        }
+      );
 
-    window.location.href = mailtoLink;
+      setIsSuccess(true);
+      setStatusMessage(
+        "Your message has been sent successfully! We'll get back to you soon."
+      );
+
+      // Clear the form only after a successful submission.
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+
+    } catch (error) {
+      console.error("EmailJS submission failed:", error);
+
+      setIsSuccess(false);
+      setStatusMessage(
+        "We couldn't send your message. Please try again in a moment."
+      );
+
+    } finally {
+      setIsSending(false);
+    }
   }
 
   return (
@@ -192,9 +235,30 @@ ${formData.message}`;
               />
             </div>
 
+            {/* Display submission status */}
+            {statusMessage && (
+              <p
+                className="message-status"
+                role="status"
+                aria-live="polite"
+                style={{
+                  color: isSuccess ? "#86efac" : "#fca5a5",
+                }}
+              >
+                {statusMessage}
+              </p>
+            )}
+
             {/* Submit the form */}
-            <button type="submit" className="message-submit">
-              <span>Send message</span>
+            <button
+              type="submit"
+              className="message-submit"
+              disabled={isSending}
+            >
+              <span>
+                {isSending ? "Sending..." : "Send message"}
+              </span>
+
               <Send size={16} />
             </button>
 
