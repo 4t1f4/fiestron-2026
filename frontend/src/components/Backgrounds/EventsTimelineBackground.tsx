@@ -1,11 +1,14 @@
 import { useEffect, useRef } from "react";
 
+// Fraction of CSS pixels the shader renders at. The background is soft and
+// low-frequency, so 0.75 is visually near-identical but ~44% cheaper than 1.0.
+// Raise to 1 for a sharper result.
+const RENDER_SCALE = 0.75;
+
 const vertexShader = `
 attribute vec2 position;
-varying vec2 vUv;
 
 void main() {
-  vUv = position * 0.5 + 0.5;
   gl_Position = vec4(position, 0.0, 1.0);
 }
 `;
@@ -13,9 +16,10 @@ void main() {
 const fragmentShader = `
 precision highp float;
 
-varying vec2 vUv;
 uniform float uTime;
-uniform vec2 uResolution;
+uniform vec2 uResolution;   // viewport canvas size in backing pixels
+uniform float uOffsetY;     // backing px from the wrapper's bottom edge to this canvas's bottom edge
+uniform float uTotalH;      // full wrapper height in backing pixels
 
 const vec3 cyberBlack = vec3(0.024, 0.016, 0.039);
 const vec3 deepPlum = vec3(0.071, 0.035, 0.122);
@@ -77,11 +81,13 @@ float ridges(vec2 p) {
 }
 
 void main() {
-  float aspect = uResolution.x / max(uResolution.y, 1.0);
   float t = uTime * 0.035;
 
-  vec2 normalizedCoord =
-    gl_FragCoord.xy / min(uResolution.x, uResolution.y);
+  // Position of this pixel within the full (tall) wrapper, so the pattern
+  // scrolls with the page exactly like the old full-height canvas did.
+  vec2 frag = vec2(gl_FragCoord.x, gl_FragCoord.y + uOffsetY);
+
+  vec2 normalizedCoord = frag / uResolution.x;
 
   vec2 p = (normalizedCoord - 0.5) * 3.0;
 
@@ -115,7 +121,11 @@ void main() {
   float limited = 0.6 * (1.0 - exp(-peak / 0.6));
   color *= limited / max(peak, 0.0001);
 
-  vec2 vignette = (vUv - 0.5) * vec2(aspect, 1.0);
+  // Same vignette as before, computed over the whole wrapper
+  vec2 vignette = vec2(
+    (frag.x / uResolution.x - 0.5) * (uResolution.x / uTotalH),
+    frag.y / uTotalH - 0.5
+  );
 
   color *= 1.0 - 0.25 * dot(vignette, vignette);
 
@@ -130,12 +140,15 @@ void main() {
 `;
 
 export default function EventsTimelineBackground() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!container || !canvas) return;
 
+    const containerEl: HTMLDivElement = container;
     const canvasEl: HTMLCanvasElement = canvas;
 
     const gl = canvasEl.getContext("webgl", {
@@ -233,48 +246,71 @@ export default function EventsTimelineBackground() {
       program,
       "uResolution"
     );
+    const offsetLocation = context.getUniformLocation(program, "uOffsetY");
+    const totalLocation = context.getUniformLocation(program, "uTotalH");
 
+    const startTime = performance.now();
     let animationFrame = 0;
-    let startTime = performance.now();
-    let paused = document.hidden;
+    let inView = true;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
 
-    function render(now: number) {
-      if (paused) return;
+    // Where this viewport-sized canvas sits inside the tall wrapper
+    function updateLayoutUniforms() {
+      const wrapperRect = containerEl.getBoundingClientRect();
+      const canvasRect = canvasEl.getBoundingClientRect();
 
+      const scale = canvasEl.width / Math.max(1, canvasRect.width);
+
+      const canvasBottomFromWrapperTop =
+        canvasRect.top - wrapperRect.top + canvasRect.height;
+
+      const offsetY =
+        (wrapperRect.height - canvasBottomFromWrapperTop) * scale;
+
+      context.uniform1f(offsetLocation, offsetY);
+      context.uniform1f(totalLocation, Math.max(1, wrapperRect.height * scale));
+    }
+
+    function draw(now: number) {
       const elapsed = (now - startTime) / 1000;
 
-      context.useProgram(program);
+      updateLayoutUniforms();
 
-      context.uniform1f(
-        timeLocation,
-        reducedMotion.matches ? 0 : elapsed
-      );
-
+      context.uniform1f(timeLocation, reducedMotion.matches ? 0 : elapsed);
       context.drawArrays(context.TRIANGLE_STRIP, 0, 4);
+    }
 
-      if (!reducedMotion.matches) {
-        animationFrame = requestAnimationFrame(render);
+    function frame(now: number) {
+      draw(now);
+      animationFrame = requestAnimationFrame(frame);
+    }
+
+    // Single place that decides whether we should be rendering
+    function sync() {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+
+      if (!inView || document.hidden) return;
+
+      if (reducedMotion.matches) {
+        draw(performance.now());
+      } else {
+        animationFrame = requestAnimationFrame(frame);
       }
     }
 
     function resize() {
-      const pixelRatio = Math.min(
-        window.devicePixelRatio || 1,
-        1.5
-      );
-
       const width = Math.max(
         1,
-        Math.floor(canvasEl.clientWidth * pixelRatio)
+        Math.floor(canvasEl.clientWidth * RENDER_SCALE)
       );
 
       const height = Math.max(
         1,
-        Math.floor(canvasEl.clientHeight * pixelRatio)
+        Math.floor(canvasEl.clientHeight * RENDER_SCALE)
       );
 
       if (canvasEl.width !== width || canvasEl.height !== height) {
@@ -283,84 +319,69 @@ export default function EventsTimelineBackground() {
       }
 
       context.viewport(0, 0, width, height);
-
-      context.useProgram(program);
       context.uniform2f(resolutionLocation, width, height);
 
-      if (reducedMotion.matches && !paused) {
-        render(performance.now());
+      if (reducedMotion.matches && inView && !document.hidden) {
+        draw(performance.now());
       }
     }
 
-    function startAnimation() {
-      cancelAnimationFrame(animationFrame);
-
-      if (paused) return;
-
-      if (reducedMotion.matches) {
-        render(performance.now());
-      } else {
-        startTime = performance.now();
-        animationFrame = requestAnimationFrame(render);
+    // Static frame must still follow the scroll position in reduced-motion mode
+    function handleScroll() {
+      if (reducedMotion.matches && inView && !document.hidden) {
+        draw(performance.now());
       }
     }
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvasEl);
+
+    // Stop rendering entirely while the Events/Timeline/FAQ block is off-screen
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        inView = entries.some((entry) => entry.isIntersecting);
+        sync();
+      },
+      { rootMargin: "100px 0px" }
+    );
+    intersectionObserver.observe(containerEl);
 
     function handleVisibility() {
-      paused = document.hidden;
-
-      if (paused) {
-        cancelAnimationFrame(animationFrame);
-      } else {
-        startAnimation();
-      }
+      sync();
     }
-
-    function handleMotionChange() {
-      startAnimation();
-    }
-
-    const observer = new ResizeObserver(resize);
-    observer.observe(canvasEl);
 
     resize();
-    startAnimation();
+    sync();
 
-    document.addEventListener(
-      "visibilitychange",
-      handleVisibility
-    );
-
-    reducedMotion.addEventListener(
-      "change",
-      handleMotionChange
-    );
+    document.addEventListener("visibilitychange", handleVisibility);
+    reducedMotion.addEventListener("change", sync);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(animationFrame);
-      observer.disconnect();
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
 
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibility
-      );
+      document.removeEventListener("visibilitychange", handleVisibility);
+      reducedMotion.removeEventListener("change", sync);
+      window.removeEventListener("scroll", handleScroll);
 
-      reducedMotion.removeEventListener(
-        "change",
-        handleMotionChange
-      );
-
-      context.deleteBuffer(buffer);
-      context.deleteProgram(program);
-      context.deleteShader(vertex);
-      context.deleteShader(fragment);
-    };
-  }, []);
+            context.deleteBuffer(buffer);
+          context.deleteProgram(program);
+          context.deleteShader(vertex);
+          context.deleteShader(fragment);
+        };
+      }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+    <div
+      ref={containerRef}
+      className="pointer-events-none absolute inset-0 z-0"
       aria-hidden="true"
-    />
+    >
+      <div className="sticky top-0 h-screen w-full">
+        <canvas ref={canvasRef} className="block h-full w-full" />
+      </div>
+    </div>
   );
 }

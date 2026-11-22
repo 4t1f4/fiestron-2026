@@ -12,7 +12,11 @@ export function initHero(
   const backgroundCtx: CanvasRenderingContext2D = backgroundContext;
 
   const offscreen = document.createElement("canvas");
-  const offscreenContext = offscreen.getContext("2d");
+
+  // Pixel readback happens here (title text -> particles), so hint the browser.
+  const offscreenContext = offscreen.getContext("2d", {
+    willReadFrequently: true,
+  });
 
   if (!offscreenContext) return;
 
@@ -48,8 +52,13 @@ export function initHero(
   let titleHeight = 0;
 
   let animationFrame = 0;
+  let resizeTimer = 0;
   let disposed = false;
   let started = false;
+  let heroVisible = true;
+
+  // Below this (in px) a particle counts as "at rest".
+  const REST_THRESHOLD = 0.02;
 
   const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
 
@@ -237,8 +246,11 @@ export function initHero(
   }
 
   // DRAW BACKGROUND PARTICLES WITH CORNER VIGNETTE FADE
+  // Returns true while any dot is still moving.
 
-  function drawBackgroundParticles() {
+  function drawBackgroundParticles(): boolean {
+    let moving = false;
+
     backgroundCtx.clearRect(0, 0, width, height);
 
     if (pointer.active) {
@@ -292,6 +304,15 @@ export function initHero(
 
       dot.x += dot.vx;
       dot.y += dot.vy;
+
+      if (
+        Math.abs(dot.vx) > REST_THRESHOLD ||
+        Math.abs(dot.vy) > REST_THRESHOLD ||
+        Math.abs(dot.homeX - dot.x) > REST_THRESHOLD ||
+        Math.abs(dot.homeY - dot.y) > REST_THRESHOLD
+      ) {
+        moving = true;
+      }
 
       // Calculate distance from center to fade dots at edges/corners.
 
@@ -357,11 +378,16 @@ export function initHero(
 
       backgroundCtx.fill(opacityGroups[i]);
     }
+
+    return moving;
   }
 
   // DRAW TITLE PARTICLES
+  // Returns true while any particle is still moving.
 
-  function drawTitleParticles() {
+  function drawTitleParticles(): boolean {
+    let moving = false;
+
     ctx.clearRect(0, 0, titleWidth, titleHeight);
 
     const colorPaths = new Map<string, Path2D>();
@@ -402,6 +428,15 @@ export function initHero(
       particle.x += particle.vx;
       particle.y += particle.vy;
 
+      if (
+        Math.abs(particle.vx) > REST_THRESHOLD ||
+        Math.abs(particle.vy) > REST_THRESHOLD ||
+        Math.abs(particle.homeX - particle.x) > REST_THRESHOLD ||
+        Math.abs(particle.homeY - particle.y) > REST_THRESHOLD
+      ) {
+        moving = true;
+      }
+
       const path = colorPaths.get(particle.color);
 
       if (path) {
@@ -428,15 +463,31 @@ export function initHero(
         ctx.fill(path);
       }
     }
+
+    return moving;
   }
 
   // ANIMATION
+  // Runs only while the hero is visible AND (the pointer is over it OR
+  // something is still moving). Once everything is at rest it stops, and
+  // requestRender() restarts it on the next interaction.
 
   function animate() {
-    if (disposed) return;
+    animationFrame = 0;
 
-    drawBackgroundParticles();
-    drawTitleParticles();
+    if (disposed || !heroVisible || document.hidden) return;
+
+    const backgroundMoving = drawBackgroundParticles();
+    const titleMoving = drawTitleParticles();
+
+    if (pointer.active || backgroundMoving || titleMoving) {
+      animationFrame = requestAnimationFrame(animate);
+    }
+  }
+
+  function requestRender() {
+    if (disposed || !started || !heroVisible || document.hidden) return;
+    if (animationFrame !== 0) return;
 
     animationFrame = requestAnimationFrame(animate);
   }
@@ -456,10 +507,14 @@ export function initHero(
     pointer.titleY = event.clientY - canvasRect.top;
 
     pointer.active = true;
+
+    requestRender();
   }
 
   function handlePointerLeave() {
     pointer.active = false;
+
+    requestRender();
   }
 
   // TOUCH MOVEMENT (PHONES / TABLETS)
@@ -479,6 +534,8 @@ export function initHero(
     pointer.titleY = touch.clientY - canvasRect.top;
 
     pointer.active = true;
+
+    requestRender();
   }
 
   function handleTouchEnd(event: TouchEvent) {
@@ -490,19 +547,66 @@ export function initHero(
     }
 
     pointer.active = false;
+
+    requestRender();
   }
 
-  // RESIZE
+  // RESIZE (debounced; skipped if the canvases did not actually change size)
 
-  function handleResize() {
+  function rebuild() {
     if (disposed || !started) return;
 
+    const backgroundRect = backgroundCanvas.getBoundingClientRect();
+    const titleRect = canvas.getBoundingClientRect();
+
+    const unchanged =
+      Math.round(backgroundRect.width) === Math.round(width) &&
+      Math.round(backgroundRect.height) === Math.round(height) &&
+      Math.round(titleRect.width) === Math.round(titleWidth) &&
+      Math.round(titleRect.height) === Math.round(titleHeight);
+
+    if (unchanged) return;
+
     cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
 
     createBackgroundParticles();
     createTitleParticles();
 
-    animate();
+    // Resizing a canvas clears it, so repaint immediately to avoid a flash.
+    drawBackgroundParticles();
+    drawTitleParticles();
+
+    requestRender();
+  }
+
+  function handleResize() {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(rebuild, 150);
+  }
+
+  // VISIBILITY
+
+  const intersectionObserver = new IntersectionObserver((entries) => {
+    heroVisible = entries.some((entry) => entry.isIntersecting);
+
+    if (heroVisible) {
+      requestRender();
+    } else {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    }
+  });
+
+  intersectionObserver.observe(hero);
+
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    } else {
+      requestRender();
+    }
   }
 
   // START
@@ -517,7 +621,7 @@ export function initHero(
 
     started = true;
 
-    animate();
+    requestRender();
   }
 
   hero.addEventListener("pointermove", handlePointerMove);
@@ -540,6 +644,7 @@ export function initHero(
   });
 
   window.addEventListener("resize", handleResize);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 
   start();
 
@@ -549,6 +654,9 @@ export function initHero(
     disposed = true;
 
     cancelAnimationFrame(animationFrame);
+    window.clearTimeout(resizeTimer);
+
+    intersectionObserver.disconnect();
 
     hero.removeEventListener("pointermove", handlePointerMove);
     hero.removeEventListener("pointerleave", handlePointerLeave);
@@ -559,5 +667,6 @@ export function initHero(
     hero.removeEventListener("touchcancel", handleTouchEnd);
 
     window.removeEventListener("resize", handleResize);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
   };
 }
