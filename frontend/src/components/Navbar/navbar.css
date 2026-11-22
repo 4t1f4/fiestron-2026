@@ -1,4 +1,6 @@
-/* FIESTRON NAVBAR */
+/* 
+   FIESTRON NAVBAR
+ */
 
 .navbar {
   position: fixed;
@@ -14,9 +16,10 @@
 
   padding: 0 6%;
 
-  background: rgba(12, 7, 20, 0.88);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  /* Fully opaque background */
+  background: #0C0714;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
   border-bottom: 1px solid rgba(175, 105, 255, 0.25);
 
@@ -24,7 +27,9 @@
 }
 
 
-/* LOGO */
+/* 
+   LOGO
+ */
 
 .navbar-logo {
   display: flex;
@@ -50,7 +55,9 @@
 }
 
 
-/* NAVIGATION LINKS */
+/* 
+   NAVIGATION LINKS
+ */
 
 .navbar-links {
   display: flex;
@@ -77,7 +84,9 @@
 }
 
 
-/* HOVER EFFECT */
+/* 
+   HOVER EFFECT
+ */
 
 .navbar-link:hover {
   color: #FFFFFF;
@@ -85,7 +94,9 @@
 }
 
 
-/* ACTIVE INDICATOR */
+/* 
+   ACTIVE INDICATOR
+ */
 
 .navbar-link::after {
   content: "";
@@ -112,7 +123,9 @@
 }
 
 
-/* MOBILE TOGGLE */
+/* 
+   MOBILE TOGGLE
+ */
 
 .navbar-toggle {
   display: none;
@@ -142,7 +155,9 @@
 }
 
 
-/* MOBILE MENU ANIMATION */
+/* 
+   MOBILE MENU ANIMATION
+ */
 
 .navbar-toggle.open span:first-child {
   transform: translateY(7px) rotate(45deg);
@@ -157,7 +172,9 @@
 }
 
 
-/* RESPONSIVE NAVBAR */
+/* 
+   RESPONSIVE NAVBAR
+ */
 
 @media (max-width: 900px) {
   .navbar {
@@ -183,9 +200,10 @@
 
     padding: 12px 5% 20px;
 
-    background: rgba(12, 7, 20, 0.97);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* Fully opaque mobile menu */
+    background: #0C0714;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 
     border-bottom: 1px solid rgba(175, 105, 255, 0.3);
 
@@ -215,19 +233,28 @@
   }
 }
 
-/* Registration button */
+
+/* 
+   REGISTRATION BUTTON
+ */
+
 .navbar-register-btn {
   padding: 0.65rem 1.35rem;
+
   border: 1px solid rgba(175, 105, 255, 0.75);
   border-radius: 999px;
-  background: linear-gradient(135deg, #af69ff, #7a2fd6);
-  color: #ffffff;
+
+  background: linear-gradient(135deg, #AF69FF, #7A2FD6);
+  color: #FFFFFF;
+
   font-family: "Orbitron", sans-serif;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.1em;
+
   cursor: pointer;
   white-space: nowrap;
+
   transition:
     transform 200ms ease,
     box-shadow 200ms ease,
