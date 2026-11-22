@@ -215,3 +215,30 @@
   }
 }
 
+/* Registration button */
+.navbar-register-btn {
+  padding: 0.65rem 1.35rem;
+  border: 1px solid rgba(175, 105, 255, 0.75);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #af69ff, #7a2fd6);
+  color: #ffffff;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    background 200ms ease;
+}
+
+.navbar-register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px rgba(175, 105, 255, 0.45);
+}
+
+.navbar-register-btn:active {
+  transform: translateY(0);
+}

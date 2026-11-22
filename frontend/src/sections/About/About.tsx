@@ -1,9 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { initAbout } from "./about";
 
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import RegistrationModal from "../../components/RegistrationModal/RegistrationModal";
 
 import "./about.css";
 
@@ -19,11 +21,13 @@ function typed(text: string) {
   ));
 }
 
-
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
+
+  // Controls the registration modal.
+  const [registrationOpen, setRegistrationOpen] = useState(false);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -75,7 +79,6 @@ export default function About() {
     // Remove animations and listeners when the component unmounts.
     return () => {
       cleanupCanvas?.();
-
       typingTimeline.scrollTrigger?.kill();
       typingTimeline.kill();
     };
@@ -95,7 +98,6 @@ export default function About() {
         max-[768px]:px-4 max-[768px]:py-16
       "
     >
-
       {/* Animated background sits behind all the About content. */}
       <canvas
         ref={canvasRef}
@@ -106,7 +108,6 @@ export default function About() {
         "
         aria-hidden="true"
       />
-
 
       {/* Main About content */}
       <div className="relative z-[1] flex w-full max-w-[900px] flex-col items-center text-center">
@@ -122,7 +123,6 @@ export default function About() {
           <span className="h-px w-[35px] bg-[#AF69FF] opacity-70" />
         </div>
 
-
         {/* Main heading */}
         <h2
           className="
@@ -134,7 +134,6 @@ export default function About() {
         >
           WHERE CODE MEETS CHAOS
         </h2>
-
 
         {/* Short introduction */}
         <p
@@ -150,7 +149,6 @@ export default function About() {
           legacy, and endless digital horizons.
         </p>
 
-
         {/* Code editor */}
         <div
           className="
@@ -162,7 +160,6 @@ export default function About() {
             backdrop-blur-[16px]
           "
         >
-
           {/* Editor top bar */}
           <div
             className="
@@ -173,14 +170,12 @@ export default function About() {
               max-[768px]:px-[0.85rem] max-[768px]:py-3
             "
           >
-
-            {/* Original terminal window controls — unchanged */}
+            {/* Terminal window controls */}
             <div className="flex gap-2">
               <span className="h-[10px] w-[10px] rounded-full bg-[#FF5F56]" />
               <span className="h-[10px] w-[10px] rounded-full bg-[#FFBD2E]" />
               <span className="h-[10px] w-[10px] rounded-full bg-[#27C93F]" />
             </div>
-
 
             {/* Filename */}
             <div
@@ -193,7 +188,6 @@ export default function About() {
               fiestron.config.ts
             </div>
 
-
             {/* College branding */}
             <div
               className="
@@ -205,11 +199,9 @@ export default function About() {
             >
               K.C. COLLEGE
             </div>
-
           </div>
 
-
-          {/* Terminal — original code and syntax colours preserved */}
+          {/* Terminal */}
           <div
             ref={terminalRef}
             className="
@@ -227,7 +219,6 @@ export default function About() {
                 </span>
               </div>
 
-
               <div className="code-line">
                 <span className="font-semibold text-[#FF2E93]">
                   {typed("const")}
@@ -242,7 +233,6 @@ export default function About() {
                 {typed(" = {")}
               </div>
 
-
               <div className="code-line">
                 {typed("  host: ")}
 
@@ -252,7 +242,6 @@ export default function About() {
 
                 {typed(",")}
               </div>
-
 
               <div className="code-line">
                 {typed("  institution: ")}
@@ -264,7 +253,6 @@ export default function About() {
                 {typed(",")}
               </div>
 
-
               <div className="code-line">
                 {typed("  tagline: ")}
 
@@ -274,7 +262,6 @@ export default function About() {
 
                 {typed(",")}
               </div>
-
 
               <div className="code-line">
                 {typed("  legacyYears: ")}
@@ -290,7 +277,6 @@ export default function About() {
                 </span>
               </div>
 
-
               <div className="code-line">
                 {typed("  events: ")}
 
@@ -300,7 +286,6 @@ export default function About() {
 
                 {typed(",")}
               </div>
-
 
               <div className="code-line">
                 {typed("  tracks: [")}
@@ -330,11 +315,9 @@ export default function About() {
                 {typed("],")}
               </div>
 
-
               <div className="code-line">
                 {typed("};")}
               </div>
-
 
               <div className="code-line">
                 <span className="text-[#FFBE0B]">
@@ -343,23 +326,22 @@ export default function About() {
 
                 {typed("(fiestron); ")}
 
-                {/* Only the cursor uses the new violet colour. */}
+                {/* Violet terminal cursor */}
                 <span className="token-cursor">_</span>
               </div>
 
             </code>
           </div>
-
         </div>
-
 
         {/* Action buttons */}
         <div className="flex flex-wrap justify-center gap-[1.2rem] max-[768px]:gap-3">
 
-          {/* Primary action */}
+          {/* Primary action: Open registration modal */}
           <span className="about-btn-wrap about-btn-wrap--primary">
-            <a
-              href="#register"
+            <button
+              type="button"
+              onClick={() => setRegistrationOpen(true)}
               className="about-btn about-btn--primary"
             >
               <span
@@ -377,14 +359,13 @@ export default function About() {
               >
                 ↗
               </span>
-            </a>
+            </button>
           </span>
 
-
-          {/* Secondary action */}
+          {/* Secondary action: Explore council */}
           <span className="about-btn-wrap about-btn-wrap--secondary">
             <a
-              href="#contact"
+              href="/council"
               className="about-btn about-btn--secondary"
             >
               <span
@@ -393,14 +374,21 @@ export default function About() {
               />
 
               <span className="about-btn-label">
-                CONTACT US
+                MEET THE MINDS
               </span>
+
             </a>
           </span>
 
         </div>
-
       </div>
+
+      {/* Registration Modal */}
+      <RegistrationModal
+        isOpen={registrationOpen}
+        onClose={() => setRegistrationOpen(false)}
+      />
+
     </section>
   );
 }

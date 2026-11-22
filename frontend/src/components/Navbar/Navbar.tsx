@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import RegistrationModal from "../RegistrationModal/RegistrationModal";
 import "./navbar.css";
 
 const navItems = [
@@ -14,6 +15,7 @@ const navItems = [
 export default function Navbar() {
   const [activeSection, setActiveSection] = useState("about");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [registrationOpen, setRegistrationOpen] = useState(false);
 
   const location = useLocation();
   const currentPath = location.pathname;
@@ -51,6 +53,7 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, [currentPath]);
 
+  // Scroll to the requested section when navigating from another page.
   useEffect(() => {
     if (currentPath !== "/home" || !location.hash) return;
 
@@ -69,62 +72,86 @@ export default function Navbar() {
   }
 
   return (
-    <header className="navbar">
-      <Link
-        to="/home#home"
-        className="navbar-logo"
-        onClick={() => {
-          handleNavigation("about");
+    <>
+      <header className="navbar">
+        <Link
+          to="/home#home"
+          className="navbar-logo"
+          onClick={() => {
+            handleNavigation("about");
 
-          if (currentPath === "/home") {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-        }}
-      >
-        <img
-          src="/FiestronLogo.png"
-          alt="Fiestron 2026"
-          className="navbar-logo-img"
-        />
-      </Link>
+            if (currentPath === "/home") {
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }
+          }}
+        >
+          <img
+            src="/FiestronLogo.png"
+            alt="Fiestron 2026"
+            className="navbar-logo-img"
+          />
+        </Link>
 
-      <button
-        className={`navbar-toggle ${menuOpen ? "open" : ""}`}
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Toggle navigation"
-        aria-expanded={menuOpen}
-      >
-        <span />
-        <span />
-        <span />
-      </button>
+        <button
+          type="button"
+          className={`navbar-toggle ${menuOpen ? "open" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle navigation"
+          aria-expanded={menuOpen}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
 
-      <nav className={`navbar-links ${menuOpen ? "show" : ""}`}>
-        {navItems.map((item) => {
-          const isActive =
-            item.id === "council"
-              ? currentPath === "/council"
-              : currentPath === "/home" &&
-                activeSection === item.id;
+        <nav className={`navbar-links ${menuOpen ? "show" : ""}`}>
+          {navItems.map((item) => {
+            const isActive =
+              item.id === "council"
+                ? currentPath === "/council"
+                : currentPath === "/home" &&
+                  activeSection === item.id;
 
-          const destination = item.href.startsWith("#")
-            ? currentPath === "/home"
-              ? item.href
-              : `/home${item.href}`
-            : item.href;
+            const destination = item.href.startsWith("#")
+              ? currentPath === "/home"
+                ? item.href
+                : `/home${item.href}`
+              : item.href;
 
-          return (
-            <Link
-              key={item.id}
-              to={destination}
-              className={`navbar-link ${isActive ? "active" : ""}`}
-              onClick={() => handleNavigation(item.id)}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-    </header>
+            return (
+              <Link
+                key={item.id}
+                to={destination}
+                className={`navbar-link ${isActive ? "active" : ""}`}
+                onClick={() => handleNavigation(item.id)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+
+          {/* Registration button */}
+          <button
+            type="button"
+            className="navbar-register-btn"
+            onClick={() => {
+              setMenuOpen(false);
+              setRegistrationOpen(true);
+            }}
+          >
+            REGISTER
+          </button>
+        </nav>
+      </header>
+
+      {/* Registration modal */}
+      <RegistrationModal
+        isOpen={registrationOpen}
+        onClose={() => setRegistrationOpen(false)}
+      />
+    </>
   );
 }

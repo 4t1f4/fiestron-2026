@@ -35,7 +35,7 @@ function Home() {
       <Hero />
       <About />
 
-      {/* The same shared background continues behind these sections */}
+      {/* Keep the shared background behind Events, Timeline and FAQ. */}
       <div className="events-timeline-wrapper">
         <EventsTimelineBackground />
 
@@ -49,11 +49,14 @@ function Home() {
   );
 }
 
-// Keep the chatbot away from the intro tunnel and dedicated message page.
+// Keep the chatbot away from the intro tunnel and standalone message page.
 function GlobalChatbot() {
   const location = useLocation();
 
-  if (location.pathname === "/" || location.pathname === "/message") {
+  if (
+    location.pathname === "/" ||
+    location.pathname === "/message"
+  ) {
     return null;
   }
 
@@ -68,9 +71,11 @@ export default function App() {
       <GlobalChatbot />
 
       <Routes>
-
         {/* Intro tunnel */}
-        <Route path="/" element={<Intro />} />
+        <Route
+          path="/"
+          element={<Intro />}
+        />
 
         {/* Main website */}
         <Route
@@ -96,12 +101,11 @@ export default function App() {
           }
         />
 
-        {/* Standalone contact page: no Navbar or Footer */}
+        {/* Standalone contact page */}
         <Route
           path="/message"
           element={<Message />}
         />
-
       </Routes>
     </BrowserRouter>
   );
