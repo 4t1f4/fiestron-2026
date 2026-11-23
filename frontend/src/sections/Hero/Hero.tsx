@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { initHero } from "./hero";
 import "./hero.css";
@@ -7,6 +7,9 @@ export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const titleCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  
+  const [mobileCardOpen, setMobileCardOpen] = useState(false);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -20,14 +23,9 @@ export default function Hero() {
     return initHero(hero, titleCanvas, backgroundCanvas);
   }, []);
 
-  
-  const goToAbout = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const scrollToAbout = () => {
     const target = document.getElementById("about");
-
-
-    if (!target) return;
-
-    event.preventDefault();
+    if (!target) return false;
 
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -37,6 +35,28 @@ export default function Hero() {
       behavior: reduceMotion ? "auto" : "smooth",
       block: "start",
     });
+
+    return true;
+  };
+
+  
+  const handleLoopClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const isTouchDevice = window.matchMedia(
+      "(hover: none), (pointer: coarse)"
+    ).matches;
+
+    if (isTouchDevice && !mobileCardOpen) {
+      event.preventDefault();
+      setMobileCardOpen(true);
+      return;
+    }
+
+    const scrolled = scrollToAbout();
+    if (scrolled) {
+      event.preventDefault();
+    }
+
+    setMobileCardOpen(false);
   };
 
   return (
@@ -48,12 +68,10 @@ export default function Hero() {
         bg-[radial-gradient(ellipse_at_50%_48%,rgba(145,71,255,0.20),transparent_55%),#06040A]
       "
     >
-      {/* Main hero content */}
-
+      {/* Main hero layout */}
       <div className="relative z-[1] flex w-full flex-col items-center px-6 py-[8rem] text-center">
 
-        {/* Particle title area */}
-
+        {/* Particle title stage */}
         <div
           className="
             relative isolate
@@ -62,9 +80,7 @@ export default function Hero() {
             py-[2.5rem]
           "
         >
-
-          {/* Background particles */}
-
+          {/* Ambient particle layer */}
           <canvas
             ref={backgroundCanvasRef}
             id="background-particles"
@@ -73,9 +89,7 @@ export default function Hero() {
           />
 
           <div className="relative z-[1] flex flex-col items-center text-center">
-
-            {/* Eyebrow */}
-
+            {/* Club presenter tag */}
             <p
               className="
                 mb-4 flex items-center gap-4
@@ -86,14 +100,11 @@ export default function Hero() {
               "
             >
               <span className="h-px w-[35px] bg-[#AF69FF] opacity-70 max-[700px]:w-5" />
-
               TECH CLUB PRESENTS
-
               <span className="h-px w-[35px] bg-[#AF69FF] opacity-70 max-[700px]:w-5" />
             </p>
 
-            {/* Particle typography */}
-
+            {/* Particle display typography */}
             <div
               className="
                 relative aspect-[3.2/1] w-full max-w-[1200px]
@@ -109,32 +120,37 @@ export default function Hero() {
 
               <h1 className="sr-only">FIESTRON</h1>
             </div>
-
           </div>
         </div>
 
-        {/* LOOP PORTAL BUTTON + DEJA VU THEME CARD */}
-
+        {/* Loop CTA and theme preview */}
         <div className="hero-cta-wrapper">
-
           <a
             href="#about"
             className="hero-loop"
-            aria-label="Enter the loop and scroll to the About section"
-            onClick={goToAbout}
+            aria-label={
+              mobileCardOpen
+                ? "Enter the loop again and scroll to the About section"
+                : "Enter the loop and scroll to the About section"
+            }
+            onClick={handleLoopClick}
           >
             <span className="hero-loop-glow" aria-hidden="true" />
             <span className="hero-loop-pulse" aria-hidden="true" />
 
             <span className="hero-loop-core" aria-hidden="true">
-              <span className="hero-loop-label">ENTER THE LOOP</span>
+              <span className="hero-loop-label">
+                {mobileCardOpen ? "TAP AGAIN TO ENTER" : "ENTER THE LOOP"}
+              </span>
               <span className="hero-loop-arrow">↓</span>
             </span>
           </a>
 
-          {/* Theme card: sits right after the button so CSS can react to hover/focus */}
-
-          <div className="theme-card">
+          {/* Placed right after .hero-loop so CSS can pair hover/focus/active/data-open states */}
+          <div
+            className="theme-card"
+            data-open={mobileCardOpen ? "true" : "false"}
+          >
             <div className="theme-card-top">
               <span className="theme-card-label">
                 <i className="theme-card-dot" aria-hidden="true" />
@@ -160,10 +176,9 @@ export default function Hero() {
             </div>
 
             <span className="theme-card-footer">
-              ITERATION ∞ · PRESS TO ENTER
+              ITERATION ∞ · TAP AGAIN TO ENTER
             </span>
           </div>
-
         </div>
       </div>
     </section>

@@ -1,5 +1,4 @@
-/* BACKGROUND PARTICLE CANVAS */
-
+/* Background particle radial fade */
 #background-particles {
   mask-image: radial-gradient(
     ellipse at center,
@@ -18,8 +17,7 @@
   );
 }
 
-/* TITLE CONTAINER */
-
+/* Title stage container */
 .title-container {
   position: relative;
   width: 85%;
@@ -32,8 +30,7 @@
   justify-content: center;
 }
 
-/* HERO BUTTON */
-
+/* Shared button styling */
 .hero-button {
   display: inline-flex;
   align-items: center;
@@ -66,8 +63,7 @@
   box-shadow: 0 0 20px rgba(175, 105, 255, 0.3);
 }
 
-/* CUSTOM CURSOR SPOTLIGHT */
-
+/* Custom pointer spotlight */
 .cursor-light {
   position: absolute;
   pointer-events: none;
@@ -116,8 +112,7 @@
     0 0 30px rgba(175, 105, 255, 0.9);
 }
 
-/* SCROLL INDICATOR */
-
+/* Scroll indicator pulse */
 @keyframes scroll-pulse {
   0%, 100% {
     opacity: 0.3;
@@ -130,18 +125,14 @@
   }
 }
 
-/* MOBILE */
-
+/* Skip custom cursor on touch devices and small viewports */
 @media (hover: none), (pointer: coarse), (max-width: 700px) {
   .cursor-light {
     display: none;
   }
 }
 
-
-/* LOOP PORTAL BUTTON (ROUNDED RECT / CAPSULE)                */
-
-
+/* Loop portal button */
 .hero-cta-wrapper {
   position: relative;
   display: flex;
@@ -180,8 +171,7 @@
   outline-offset: 6px;
 }
 
-/* Soft breathing glow */
-
+/* Soft glow behind the portal button */
 .hero-loop-glow {
   position: absolute;
   inset: -14px -22px;
@@ -213,8 +203,7 @@
   }
 }
 
-/* Expanding rounded border wave */
-
+/* Expanding outline wave */
 .hero-loop-pulse {
   position: absolute;
   inset: 0;
@@ -238,8 +227,7 @@
   }
 }
 
-/* Core button body */
-
+/* Main capsule body */
 .hero-loop-core {
   position: relative;
 
@@ -316,12 +304,9 @@
   }
 }
 
-
-/* DEJA VU THEME CARD */
-
-
+/* Deja Vu theme card */
 .theme-card {
-  /* Animations stay paused while the card is hidden. */
+  /* Pause card animations while tucked away */
   --card-play: paused;
 
   position: absolute;
@@ -334,7 +319,7 @@
   text-align: center;
   pointer-events: none;
 
-  /* No backdrop-filter: it forced a re-blur of the live particle canvas. */
+  /* Avoid backdrop-filter here so the particle canvas doesn't re-blur every frame */
   background:
     radial-gradient(
       ellipse at 50% 0%,
@@ -364,8 +349,7 @@
     visibility 0.35s ease;
 }
 
-/* Corner brackets */
-
+/* Framing brackets on opposite corners */
 .theme-card::before,
 .theme-card::after {
   content: "";
@@ -389,10 +373,10 @@
   border-bottom: 2px solid #D9B8FF;
 }
 
-/* Visible on hover / keyboard focus of the button */
-
+/* Show on hover/focus (desktop) or after the first tap on touch screens */
 .hero-loop:hover + .theme-card,
-.hero-loop:focus-visible + .theme-card {
+.hero-loop:focus-visible + .theme-card,
+.theme-card[data-open="true"] {
   --card-play: running;
 
   opacity: 1;
@@ -400,8 +384,7 @@
   transform: translateY(0) scale(1);
 }
 
-/* Top row */
-
+/* Top meta bar */
 .theme-card-top {
   display: flex;
   align-items: center;
@@ -451,8 +434,7 @@
   letter-spacing: 0.18em;
 }
 
-/* Title with echo layers */
-
+/* Offset echo layers behind the theme title */
 .theme-title {
   position: relative;
   display: inline-block;
@@ -513,8 +495,7 @@
   }
 }
 
-/* Tagline */
-
+/* Tagline lines */
 .theme-line {
   margin: 0;
 
@@ -547,8 +528,7 @@
   }
 }
 
-/* Timeline: PAST -> PRESENT -> FUTURE with a looping pulse */
-
+/* Past -> Present -> Future timeline with a traveling highlight */
 .theme-timeline {
   position: relative;
 
@@ -631,8 +611,7 @@
   letter-spacing: 0.22em;
 }
 
-/* Small screens */
-
+/* Compact spacing for smaller screens */
 @media (max-width: 600px) {
   .hero-loop-core {
     padding: 0.9rem 1.55rem;
@@ -654,26 +633,7 @@
   }
 }
 
-/* Touch screens have no hover, so the card is always visible above the button */
-
-@media (hover: none), (pointer: coarse) {
-  .theme-card {
-    --card-play: running;
-
-    position: relative;
-    bottom: auto;
-    order: -1;
-
-    margin-bottom: 26px;
-
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-  }
-}
-
-/* Reduced motion */
-
+/* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .hero-loop,
   .hero-loop-glow,
