@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { initHero } from "./hero";
 import "./hero.css";
@@ -7,9 +7,6 @@ export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const titleCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
-
-  const [showTheme, setShowTheme] = useState(false);
-  const [pinned, setPinned] = useState(false);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -22,6 +19,25 @@ export default function Hero() {
 
     return initHero(hero, titleCanvas, backgroundCanvas);
   }, []);
+
+  
+  const goToAbout = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const target = document.getElementById("about");
+
+
+    if (!target) return;
+
+    event.preventDefault();
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    target.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
 
   return (
     <section
@@ -97,56 +113,56 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* CTA and DEJA VU theme card */}
+        {/* LOOP PORTAL BUTTON + DEJA VU THEME CARD */}
 
         <div className="hero-cta-wrapper">
 
-          <div
-            className={`theme-card ${showTheme ? "theme-card-visible" : ""}`}
-            aria-hidden={!showTheme}
-          >
-            <span className="theme-card-label">THE THEME</span>
-
-            <h3>DEJA VU</h3>
-
-            <p>
-              You've been here before.
-              <br />
-              Or have you?
-            </p>
-
-            <span className="theme-card-footer">
-              PAST · PRESENT · FUTURE
-            </span>
-          </div>
-
           <a
             href="#about"
-            className="hero-cta"
-            onMouseEnter={() => setShowTheme(true)}
-            onMouseLeave={() => {
-              if (!pinned) setShowTheme(false);
-            }}
-            onFocus={() => setShowTheme(true)}
-            onBlur={() => {
-              if (!pinned) setShowTheme(false);
-            }}
-            onClick={(e) => {
-              if (!pinned) {
-                e.preventDefault();
-                setPinned(true);
-                setShowTheme(true);
-              } else {
-                setPinned(false);
-              }
-            }}
+            className="hero-loop"
+            aria-label="Enter the loop and scroll to the About section"
+            onClick={goToAbout}
           >
-            <span className="hero-cta-text">ENTER THE LOOP</span>
+            <span className="hero-loop-glow" aria-hidden="true" />
+            <span className="hero-loop-pulse" aria-hidden="true" />
 
-            <span className="hero-cta-arrow" aria-hidden="true">
-              ↗
+            <span className="hero-loop-core" aria-hidden="true">
+              <span className="hero-loop-label">ENTER THE LOOP</span>
+              <span className="hero-loop-arrow">↓</span>
             </span>
           </a>
+
+          {/* Theme card: sits right after the button so CSS can react to hover/focus */}
+
+          <div className="theme-card">
+            <div className="theme-card-top">
+              <span className="theme-card-label">
+                <i className="theme-card-dot" aria-hidden="true" />
+                // THE THEME
+              </span>
+
+              <span className="theme-card-tag">LOOP_2026</span>
+            </div>
+
+            <h3 className="theme-title" data-text="DEJA VU">
+              DEJA VU
+            </h3>
+
+            <p className="theme-line">You've been here before.</p>
+            <p className="theme-line theme-line-flicker">Or have you?</p>
+
+            <div className="theme-timeline" aria-hidden="true">
+              <span className="theme-track" />
+
+              <span className="theme-node">PAST</span>
+              <span className="theme-node">PRESENT</span>
+              <span className="theme-node">FUTURE</span>
+            </div>
+
+            <span className="theme-card-footer">
+              ITERATION ∞ · PRESS TO ENTER
+            </span>
+          </div>
 
         </div>
       </div>
