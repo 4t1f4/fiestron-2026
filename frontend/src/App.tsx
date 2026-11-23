@@ -23,6 +23,7 @@ import Hero from "./sections/Hero/Hero.tsx";
 import About from "./sections/About/About.tsx";
 import Events from "./sections/Events/Events.tsx";
 import Timeline from "./sections/Timeline/Timeline.tsx";
+import Sponsors from "./sections/Sponsors/Sponsors.tsx";
 import Faq from "./sections/Faq/Faq.tsx";
 
 // Pages
@@ -42,6 +43,7 @@ function Home() {
         <div className="events-timeline-content">
           <Events />
           <Timeline />
+          <Sponsors />
           <Faq />
         </div>
       </div>

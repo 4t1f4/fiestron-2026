@@ -1,0 +1,451 @@
+/* Sponsors section */
+.sponsors-section {
+  position: relative;
+  width: 100%;
+  padding: 100px 6%;
+  overflow: hidden;
+  background: transparent;
+  color: #ffffff;
+}
+
+.sponsors-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Section heading */
+.sponsors-heading {
+  text-align: center;
+  margin-bottom: 55px;
+}
+
+.sponsors-eyebrow {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: #d9b8ff;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+}
+
+.sponsors-heading h2 {
+  margin: 0;
+  color: #ffffff;
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.sponsors-heading h2 span {
+  color: #af69ff;
+  text-shadow: 0 0 25px rgba(175, 105, 255, 0.4);
+}
+
+.sponsors-heading > p {
+  margin-top: 16px;
+  color: #aaa1b8;
+  font-family: "Sora", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+/* Sponsor cards layout */
+.sponsors-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+/* Individual sponsor card */
+.sponsor-card {
+  --highlight: #af69ff;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  width: 100%;
+  aspect-ratio: 4 / 4.5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(175, 105, 255, 0.24);
+  border-radius: 10px;
+
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(122, 47, 214, 0.2),
+      transparent 65%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(35, 19, 53, 0.85),
+      rgba(12, 7, 20, 0.96)
+    );
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.2),
+    inset 0 0 25px rgba(175, 105, 255, 0.035);
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.5s ease,
+    box-shadow 0.7s ease,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Logo stays centered inside the card */
+.sponsor-logo-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  transition: transform 0.8s cubic-bezier(0.66, 0.08, 0.19, 0.97);
+}
+
+.sponsor-logo {
+  width: 75%;
+  max-width: 150px;
+  height: 75%;
+  max-height: 150px;
+
+  object-fit: contain;
+
+  filter: drop-shadow(0 0 18px rgba(175, 105, 255, 0.25));
+
+  transition:
+    transform 0.8s ease,
+    filter 0.8s ease;
+}
+
+/* Split panels reveal the sponsor details on hover */
+.sponsor-cover {
+  position: absolute;
+  left: 0;
+  z-index: 1;
+
+  width: 100%;
+  height: 50%;
+
+  background: rgba(10, 5, 18, 0.88);
+
+  transform: scaleX(0);
+  transform-origin: left;
+
+  transition:
+    transform 0.5s cubic-bezier(0.66, 0.08, 0.19, 0.97);
+}
+
+.sponsor-cover-top {
+  top: 0;
+}
+
+.sponsor-cover-bottom {
+  bottom: 0;
+  transition-delay: 0.12s;
+}
+
+/* Sponsor name and description */
+.sponsor-info {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  padding: 20px;
+
+  pointer-events: none;
+}
+
+.sponsor-number {
+  margin-bottom: 8px;
+
+  color: #d9b8ff;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+
+  opacity: 0;
+  transform: translateY(12px);
+
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.sponsor-info h3 {
+  margin: 0 0 8px;
+
+  color: #ffffff;
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(0.85rem, 1.2vw, 1.1rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+
+  opacity: 0;
+  transform: translateY(18px);
+
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.38, 0.26, 0.05, 1.07);
+
+  transition-delay: 0.1s;
+}
+
+.sponsor-info p {
+  margin: 0;
+
+  color: #c9bfd6;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(0.62rem, 0.8vw, 0.72rem);
+  line-height: 1.6;
+
+  opacity: 0;
+  transform: translateY(18px);
+
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.38, 0.26, 0.05, 1.07);
+
+  transition-delay: 0.18s;
+}
+
+/* Small corner details */
+.sponsor-corner {
+  position: absolute;
+  z-index: 4;
+
+  width: 12px;
+  height: 12px;
+
+  border-color: #d9b8ff;
+  border-style: solid;
+  border-width: 0;
+
+  opacity: 0;
+
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+.sponsor-corner-tl {
+  top: 9px;
+  left: 9px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+  transform: translate(-4px, -4px);
+}
+
+.sponsor-corner-tr {
+  top: 9px;
+  right: 9px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+  transform: translate(4px, -4px);
+}
+
+.sponsor-corner-bl {
+  bottom: 9px;
+  left: 9px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+  transform: translate(-4px, 4px);
+}
+
+.sponsor-corner-br {
+  bottom: 9px;
+  right: 9px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+  transform: translate(4px, 4px);
+}
+
+/* Hover and keyboard focus effects */
+.sponsor-card:hover,
+.sponsor-card:focus-visible {
+  border-color: rgba(217, 184, 255, 0.8);
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.35),
+    0 0 25px rgba(175, 105, 255, 0.2),
+    inset 0 0 25px rgba(175, 105, 255, 0.08);
+
+  transform: translateY(-7px);
+}
+
+.sponsor-card:hover .sponsor-cover,
+.sponsor-card:focus-visible .sponsor-cover {
+  transform: scaleX(1);
+}
+
+.sponsor-card:hover .sponsor-logo,
+.sponsor-card:focus-visible .sponsor-logo {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 22px rgba(175, 105, 255, 0.45));
+}
+
+.sponsor-card:hover .sponsor-info .sponsor-number,
+.sponsor-card:hover .sponsor-info h3,
+.sponsor-card:hover .sponsor-info p,
+.sponsor-card:focus-visible .sponsor-info .sponsor-number,
+.sponsor-card:focus-visible .sponsor-info h3,
+.sponsor-card:focus-visible .sponsor-info p {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sponsor-card:hover .sponsor-corner,
+.sponsor-card:focus-visible .sponsor-corner {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.sponsor-card:focus-visible {
+  outline: 2px solid #d9b8ff;
+  outline-offset: 5px;
+}
+
+/* Text below the sponsor grid */
+.sponsors-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+
+  margin-top: 45px;
+}
+
+.sponsors-footer span {
+  width: 55px;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(175, 105, 255, 0.65)
+  );
+}
+
+.sponsors-footer span:last-child {
+  transform: rotate(180deg);
+}
+
+.sponsors-footer p {
+  margin: 0;
+
+  color: #93869f;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-align: center;
+}
+
+/* Tablet layout */
+@media (max-width: 1000px) {
+  .sponsors-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 850px;
+  }
+
+  .sponsor-info {
+    padding: 16px;
+  }
+}
+
+/* Mobile layout */
+@media (max-width: 650px) {
+  .sponsors-section {
+    padding: 75px 5%;
+  }
+
+  .sponsors-heading {
+    margin-bottom: 40px;
+  }
+
+  .sponsors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    max-width: 480px;
+  }
+
+  .sponsor-card {
+    aspect-ratio: 4 / 4.6;
+  }
+
+  .sponsor-logo-wrapper {
+    padding: 18px;
+  }
+
+  .sponsor-logo {
+    max-width: 120px;
+    max-height: 120px;
+  }
+
+  .sponsor-info {
+    padding: 12px;
+  }
+
+  .sponsor-info h3 {
+    font-size: 0.8rem;
+  }
+
+  .sponsor-info p {
+    font-size: 0.6rem;
+    line-height: 1.5;
+  }
+
+  .sponsors-footer {
+    gap: 12px;
+    margin-top: 35px;
+  }
+
+  .sponsors-footer p {
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .sponsors-grid {
+    gap: 10px;
+  }
+
+  .sponsor-info {
+    padding: 10px;
+  }
+
+  .sponsor-info p {
+    font-size: 0.57rem;
+  }
+}
+
+/* Respect reduced-motion settings */
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-card,
+  .sponsor-card *,
+  .sponsor-card::before,
+  .sponsor-card::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
