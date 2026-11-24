@@ -1,20 +1,110 @@
+
+/* SECTION                                                    */
+
 .events-section {
   scroll-margin-top: 84px;
+  padding-block: 4rem;
+}
+
+.events-container {
+  width: min(1140px, 92%);
+  margin-inline: auto;
+}
+
+
+/* SECTION HEADER (centred)                                   */
+
+.events-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  max-width: 40rem;
+  margin: 0 auto 2.5rem;
+
+  text-align: center;
+}
+
+.events-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+
+  margin: 0 0 1rem;
+
+  color: #d9b8ff;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.events-eyebrow-line {
+  width: 28px;
+  height: 1px;
+  background: #af69ff;
+  opacity: 0.7;
 }
 
 .events-hero-title {
   margin: 0;
+
+  color: #ffffff;
   font-family: "Orbitron", sans-serif;
-  font-size: clamp(1.85rem, 4.8vw, 3.65rem);
+  font-size: clamp(1.6rem, 6.4vw, 3.4rem);
   font-weight: 900;
-  line-height: 1.06;
+  line-height: 1.1;
   letter-spacing: 0.06em;
+  text-wrap: balance;
 }
 
 .events-hero-title span {
   color: #af69ff;
   text-shadow: 0 0 24px rgba(175, 105, 255, 0.35);
 }
+
+.events-head-copy {
+  max-width: 34rem;
+  margin: 1.1rem 0 0;
+
+  color: #c5c1cf;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  text-wrap: balance;
+}
+
+.events-head-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+
+  margin-top: 1.5rem;
+}
+
+.events-head-rule {
+  width: 46px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #af69ff);
+}
+
+.events-head-rule:last-child {
+  background: linear-gradient(90deg, #af69ff, transparent);
+}
+
+.events-head-count {
+  color: #af69ff;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+}
+
+
+/* SHARED TEXT HELPERS (also used by the popup)               */
 
 .events-body-copy {
   margin: 0;
@@ -29,61 +119,90 @@
   letter-spacing: 0.16em;
 }
 
+
+/* CARD STACK                                                 */
+
+.events-stack {
+  padding-bottom: 2rem;
+}
+
+.events-card-wrapper {
+  position: sticky;
+  top: calc(76px + var(--i, 0) * 6px);
+  margin-bottom: 1.1rem;
+}
+
 .events-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  padding: 1rem;
+
   background-color: #0b0812;
   border: 1px solid rgba(175, 105, 255, 0.32);
   border-top: 2px solid #c77dff;
+  border-radius: 20px;
+
   box-shadow:
-    0 -8px 24px rgba(145, 71, 255, 0.16),
-    0 24px 60px rgba(0, 0, 0, 0.88);
+    0 -6px 18px rgba(145, 71, 255, 0.14),
+    0 16px 36px rgba(0, 0, 0, 0.8);
+
   transform-origin: top center;
   will-change: transform;
 }
 
+/*  Card header  */
+
+.events-card-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "num  btn"
+    "meta meta";
+  align-items: center;
+  gap: 0.7rem 1rem;
+}
+
 .events-card-index {
+  grid-area: num;
+
   font-family: "Orbitron", sans-serif;
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: clamp(2.3rem, 11vw, 3rem);
   font-weight: 900;
-  line-height: 0.92;
+  line-height: 1;
   letter-spacing: 0.04em;
+
   color: transparent;
-  -webkit-text-stroke: 1.5px #af69ff;
-}
-
-.events-card-title {
-  margin: 0;
-  font-family: "Orbitron", sans-serif;
-  font-size: clamp(1.3rem, 2.5vw, 2.05rem);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: 0.06em;
-}
-
-.events-card-format {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: clamp(0.65rem, 1vw, 0.78rem);
-  font-weight: 600;
-  letter-spacing: 0.22em;
-}
-
-.events-pill-badge {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  color: #e3ccff;
-  background-color: #191029;
-  border: 1px solid rgba(175, 105, 255, 0.5);
+  -webkit-text-stroke: 1.25px #af69ff;
 }
 
 .events-details-btn {
+  grid-area: btn;
+  justify-self: end;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  padding: 0.5rem 0.95rem;
+
+  color: #ffffff;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
   background-color: #191029;
   border: 1px solid rgba(199, 125, 255, 0.55);
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  border-radius: 999px;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .events-details-btn:hover {
@@ -92,17 +211,206 @@
   transform: translateY(-1px);
 }
 
-.events-bento-box {
-  background-color: #12091f;
-  border: 1px solid rgba(175, 105, 255, 0.24);
+.events-details-btn:focus-visible {
+  outline: 2px solid #d9b8ff;
+  outline-offset: 3px;
 }
 
+.events-card-meta {
+  grid-area: meta;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+
+  min-width: 0;
+  text-align: left;
+}
+
+.events-pill-badge {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.22rem 0.7rem;
+
+  color: #e3ccff;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  background-color: #191029;
+  border: 1px solid rgba(175, 105, 255, 0.5);
+  border-radius: 999px;
+}
+
+.events-card-title {
+  margin: 0;
+
+  color: #ffffff;
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(1.05rem, 4.8vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.events-card-format {
+  margin: 0;
+
+  color: #d9d4e2;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/*  Image bento  */
+
+.events-bento {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 0.55rem;
+
+  height: 156px;
+}
+
+.events-bento-stack {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.55rem;
+
+  min-height: 0;
+}
+
+.events-bento-box {
+  min-height: 0;
+  overflow: hidden;
+
+  background-color: #12091f;
+  border: 1px solid rgba(175, 105, 255, 0.24);
+  border-radius: 14px;
+}
+
+.events-bento-box img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  transition: transform 0.5s ease;
+}
+
+@media (hover: hover) {
+  .events-bento-box img:hover {
+    transform: scale(1.05);
+  }
+}
+
+
+/* TABLET / DESKTOP                                           */
+
+
+@media (min-width: 640px) {
+  .events-section {
+    padding-block: 6rem;
+  }
+
+  .events-head {
+    margin-bottom: 3.5rem;
+  }
+
+  .events-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.34em;
+  }
+
+  .events-eyebrow-line {
+    width: 38px;
+  }
+
+  .events-head-copy {
+    font-size: 1rem;
+  }
+
+  .events-head-count {
+    font-size: 0.66rem;
+  }
+
+  .events-card-wrapper {
+    top: calc(92px + var(--i, 0) * 8px);
+    margin-bottom: 1.5rem;
+  }
+
+  .events-card {
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-radius: 26px;
+  }
+
+  .events-card-head {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "num meta btn";
+    gap: 1.4rem;
+  }
+
+  .events-card-index {
+    font-size: clamp(3rem, 5.5vw, 4.25rem);
+    -webkit-text-stroke-width: 1.5px;
+  }
+
+  .events-card-title {
+    font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+  }
+
+  .events-card-format {
+    font-size: 0.72rem;
+  }
+
+  .events-details-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.7rem;
+  }
+
+  .events-bento {
+    height: 230px;
+    gap: 0.8rem;
+  }
+
+  .events-bento-stack {
+    gap: 0.8rem;
+  }
+
+  .events-bento-box {
+    border-radius: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .events-card {
+    padding: 1.75rem;
+  }
+
+  .events-bento {
+    height: 280px;
+  }
+}
+
+
+/* DETAILS POPUP */
+
 .events-modal-backdrop {
-  background-color: rgba(6, 4, 10, 0.85);
-  backdrop-filter: blur(12px);
+  background-color: rgba(6, 4, 10, 0.92);
 }
 
 .events-modal {
+  max-height: 88dvh;
+
   background-color: #0b0812;
   border: 1px solid rgba(175, 105, 255, 0.42);
   border-top: 2px solid #d9b8ff;
@@ -112,7 +420,9 @@
 .events-modal-close {
   background-color: #0b0812;
   border: 1px solid rgba(217, 184, 255, 0.4);
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .events-modal-close:hover {
@@ -131,10 +441,13 @@
 
 .events-modal-title {
   margin: 0;
+
   font-family: "Orbitron", sans-serif;
-  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  font-size: clamp(1.3rem, 5vw, 2.25rem);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+  text-wrap: balance;
 }
 
 .events-detail-tile {
@@ -145,7 +458,9 @@
 .events-modal-cta {
   background: linear-gradient(120deg, #7a2fd6, #9147ff);
   border: 1px solid rgba(217, 184, 255, 0.5);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .events-modal-cta:hover {
@@ -165,5 +480,10 @@
 @media (prefers-reduced-motion: reduce) {
   .events-card {
     will-change: auto;
+  }
+
+  .events-bento-box img,
+  .events-details-btn {
+    transition: none;
   }
 }
