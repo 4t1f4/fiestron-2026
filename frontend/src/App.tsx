@@ -30,13 +30,16 @@ import Faq from "./sections/Faq/Faq.tsx";
 import Council from "./pages/Council/Council.tsx";
 import Message from "./pages/Message/Message.tsx";
 
+// Event Details
+import CodeParadox from "./pages/EventDetails/CodeParadox";
+
 function Home() {
   return (
     <main>
       <Hero />
       <About />
 
-      {/* Keep the shared background behind Events, Timeline and FAQ. */}
+      {/* shared background */}
       <div className="events-timeline-wrapper">
         <EventsTimelineBackground />
 
@@ -108,6 +111,21 @@ export default function App() {
           path="/message"
           element={<Message />}
         />
+
+        <Route
+          path="/events/code-paradox"
+          element={
+            <>
+              <Navbar />
+              <CodeParadox />
+              
+            </>
+          }
+        />
+
+
+
+
       </Routes>
     </BrowserRouter>
   );
