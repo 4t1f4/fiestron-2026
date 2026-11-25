@@ -1,9 +1,11 @@
-
-/* SECTION                                                    */
+/* SECTION */
 
 .events-section {
-  scroll-margin-top: 84px;
-  padding-block: 4rem;
+  --events-nav: 80px;
+  scroll-margin-top: 0;
+
+  padding-top: calc(var(--events-nav) + 2.5rem);
+  padding-bottom: 4rem;
 }
 
 .events-container {
@@ -12,7 +14,7 @@
 }
 
 
-/* SECTION HEADER (centred)                                   */
+/* SECTION HEADER (centred) */
 
 .events-head {
   display: flex;
@@ -104,7 +106,7 @@
 }
 
 
-/* SHARED TEXT HELPERS (also used by the popup)               */
+/* SHARED TEXT HELPERS */
 
 .events-body-copy {
   margin: 0;
@@ -120,7 +122,7 @@
 }
 
 
-/* CARD STACK                                                 */
+/* CARD STACK */
 
 .events-stack {
   padding-bottom: 2rem;
@@ -128,7 +130,8 @@
 
 .events-card-wrapper {
   position: sticky;
-  top: calc(76px + var(--i, 0) * 6px);
+  /* --i is set per card (0..7) from Events.tsx */
+  top: calc(var(--events-nav) + 0.75rem + var(--i, 0) * 6px);
   margin-bottom: 1.1rem;
 }
 
@@ -152,7 +155,7 @@
   will-change: transform;
 }
 
-/*  Card header  */
+/* Card header */
 
 .events-card-head {
   display: grid;
@@ -270,7 +273,7 @@
   text-transform: uppercase;
 }
 
-/*  Image bento  */
+/* Image bento */
 
 .events-bento {
   display: grid;
@@ -313,12 +316,14 @@
 }
 
 
-/* TABLET / DESKTOP                                           */
-
+/* TABLET / DESKTOP */
 
 @media (min-width: 640px) {
   .events-section {
-    padding-block: 6rem;
+    --events-nav: 100px;
+
+    padding-top: calc(var(--events-nav) + 3rem);
+    padding-bottom: 6rem;
   }
 
   .events-head {
@@ -343,7 +348,7 @@
   }
 
   .events-card-wrapper {
-    top: calc(92px + var(--i, 0) * 8px);
+    top: calc(var(--events-nav) + 1rem + var(--i, 0) * 8px);
     margin-bottom: 1.5rem;
   }
 

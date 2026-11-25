@@ -139,7 +139,7 @@ void main() {
 }
 `;
 
-export default function EventsTimelineBackground() {
+export default function NebulaBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -336,7 +336,7 @@ export default function EventsTimelineBackground() {
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(canvasEl);
 
-    // Stop rendering entirely while the Events/Timeline/FAQ block is off-screen
+    // Stop rendering entirely while the section is off-screen
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         inView = entries.some((entry) => entry.isIntersecting);

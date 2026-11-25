@@ -104,16 +104,16 @@
   }
 }
 
-/* Shared background wrapper */
+/* Shared .nebula background wrapper */
 
-.events-timeline-wrapper {
+.nebula-wrapper {
   position: relative;
   isolation: isolate;
   width: 100%;
   background: #06040A;
 }
 
-.events-timeline-wrapper > canvas {
+.nebula-wrapper > canvas {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -122,7 +122,7 @@
   pointer-events: none;
 }
 
-.events-timeline-content {
+.nebula-content {
   position: relative;
   z-index: 1;
   width: 100%;

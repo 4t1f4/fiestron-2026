@@ -16,7 +16,7 @@ import Footer from "./components/Footer/Footer.tsx";
 import Chatbot from "./components/Chatbot/Chatbot.tsx";
 
 // Backgrounds
-import EventsTimelineBackground from "./components/Backgrounds/EventsTimelineBackground.tsx";
+import NebulaBackground from "./components/Backgrounds/NebulaBackground.tsx";
 
 // Home sections
 import Hero from "./sections/Hero/Hero.tsx";
@@ -39,11 +39,11 @@ function Home() {
       <Hero />
       <About />
 
-      {/* shared background */}
-      <div className="events-timeline-wrapper">
-        <EventsTimelineBackground />
+      {/* shared Nebula background */}
+      <div className="nebula-wrapper">
+        <NebulaBackground />
 
-        <div className="events-timeline-content">
+        <div className="nebula-content">
           <Events />
           <Timeline />
           <Sponsors />
@@ -116,7 +116,7 @@ export default function App() {
           path="/events/code-paradox"
           element={
             <>
-              <Navbar />
+              {/* <Navbar /> */}
               <CodeParadox />
               
             </>
