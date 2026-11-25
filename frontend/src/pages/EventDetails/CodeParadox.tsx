@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import EventDetailsNavbar from "../../components/EventDetailsLayout/EventDetailsNavbar";
+import EventDetailsFooter from "../../components/EventDetailsLayout/EventDetailsFooter";
+
 import {
-  ArrowLeft,
   ArrowUpRight,
   CalendarDays,
   Clock,
@@ -10,7 +11,7 @@ import {
   Users,
 } from "lucide-react";
 
-const REGISTER_LINK = "#register"; 
+const REGISTER_LINK = "#register";
 
 const EVENT_SPECS = [
   {
@@ -95,117 +96,83 @@ const RULES = [
 
 export default function CodeParadox() {
   return (
-    <main className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#06040A] text-white">
-      {/* Top ambient glow and subtle grid */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[560px] bg-[radial-gradient(ellipse_at_50%_15%,rgba(145,71,255,0.26),rgba(18,9,31,0.52)_55%,transparent_80%)]"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[520px] opacity-20 [background-image:linear-gradient(to_right,rgba(175,105,255,0.16)_1px,transparent_1px),linear-gradient(to_bottom,rgba(175,105,255,0.16)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:linear-gradient(to_bottom,black_35%,transparent_100%)]"
-        aria-hidden="true"
-      />
+    <main className="flex min-h-screen flex-col overflow-x-hidden bg-[#06040A] text-white">
+      <EventDetailsNavbar />
 
-      {/* Top pill bar */}
-      <header className="sticky top-5 z-40 mx-auto w-full max-w-5xl px-4 sm:px-6">
-        <div className="flex items-center justify-between rounded-full border border-[#AF69FF]/30 bg-[#0E0916]/85 px-5 py-2.5 shadow-[0_12px_36px_rgba(0,0,0,0.65)] backdrop-blur-md">
-          <Link
-            to="/home"
-            className="font-['Orbitron'] text-sm font-extrabold tracking-[0.2em] text-white transition hover:text-[#D9B8FF]"
-          >
-            FIESTRON
-          </Link>
+      {/* Hero banner */}
+      <section className="relative isolate w-full pt-[76px]">
+        {/* Background photo */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-35"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=2000&q=85')",
+          }}
+          aria-hidden="true"
+        />
 
-          <div className="flex items-center gap-4 sm:gap-6">
-            <Link
-              to="/home#events"
-              className="inline-flex items-center gap-1.5 font-mono text-xs tracking-[0.18em] text-[#C5C1CF] transition hover:text-[#D9B8FF]"
-            >
-              <ArrowLeft size={14} className="text-[#AF69FF]" />
-              ALL EVENTS
-            </Link>
+        {/* Subtle dark + violet tint */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[#06040A]/75 via-[#0B0713]/65 to-[#160D26]/90"
+          aria-hidden="true"
+        />
 
-            <a
-              href={REGISTER_LINK}
-              className="rounded-full bg-white px-5 py-2 font-mono text-xs font-bold tracking-[0.18em] text-[#06040A] transition hover:bg-[#D9B8FF]"
-            >
-              REGISTER
-            </a>
-          </div>
-        </div>
-      </header>
+        <div className="mx-auto w-full max-w-6xl px-6 pt-12 pb-28 sm:px-10 sm:pt-16">
+          <span className="mb-4 inline-block rounded-full border border-[#AF69FF]/40 bg-[#AF69FF]/15 px-3.5 py-1 font-mono text-[11px] font-medium tracking-[0.2em] text-[#D9B8FF]">
+            TECHNICAL EVENT
+          </span>
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-6 pt-14 pb-20 sm:px-10">
-        {/* Upper hero + spec strip */}
-        <section className="mb-16">
-          <div className="mb-5 flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#AF69FF]/45 bg-[#AF69FF]/15 px-3.5 py-1 font-mono text-[11px] font-semibold tracking-[0.22em] text-[#D9B8FF] shadow-[0_0_20px_rgba(175,105,255,0.22)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#D9B8FF] shadow-[0_0_8px_#AF69FF]" />
-              TECHNICAL EVENT
-            </span>
-
-            <span className="font-mono text-xs tracking-[0.28em] text-[#8E829E]">
-              EVENT 01 <span className="text-[#AF69FF]">/</span> FIESTRON 2026
-            </span>
-          </div>
-
-          {/* Creative split display heading */}
-          <div className="relative mb-5">
-            <span
-              className="pointer-events-none absolute -top-5 left-0 select-none font-['Orbitron'] text-5xl font-black uppercase tracking-[0.18em] text-[#AF69FF]/[0.06] sm:text-7xl lg:text-8xl"
-              aria-hidden="true"
-            >
-              PARADOX
-            </span>
-
-            <h1 className="relative font-['Orbitron'] text-4xl font-black uppercase tracking-[0.06em] sm:text-6xl lg:text-7xl">
-              <span className="text-white drop-shadow-[0_0_24px_rgba(175,105,255,0.3)]">
-                CODE{" "}
-              </span>
-              <span className="bg-gradient-to-r from-[#D9B8FF] via-[#AF69FF] to-[#7A2FD6] bg-clip-text text-transparent">
-                PARADOX
-              </span>
-            </h1>
-
-            <div className="mt-4 flex items-center gap-3" aria-hidden="true">
-              <span className="h-[2px] w-14 rounded-full bg-gradient-to-r from-[#AF69FF] to-transparent" />
-              <span className="h-1 w-1 rounded-full bg-[#D9B8FF]" />
-           
-            </div>
-          </div>
-
-          <p className="max-w-2xl text-base leading-relaxed text-[#C5C1CF] sm:text-lg">
-            Bridging the foundational era of computing and modern algorithmic optimization.
+          <p className="mb-2 font-mono text-xs tracking-[0.28em] text-[#A99AA5]">
+            EVENT 01 <span className="text-[#AF69FF]">/</span> FIESTRON 2026
           </p>
 
-          {/* 6-column metadata bar */}
-          <div className="relative mt-10 rounded-2xl border border-[#AF69FF]/25 bg-[#110B1C]/90 px-6 py-6 shadow-[0_20px_50px_rgba(0,0,0,0.55)] sm:px-8">
-            <span
-              className="pointer-events-none absolute top-2.5 left-2.5 h-3 w-3 border-t border-l border-[#D9B8FF]/60"
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute right-2.5 bottom-2.5 h-3 w-3 border-r border-b border-[#D9B8FF]/60"
-              aria-hidden="true"
-            />
+          <h1 className="mb-3 font-['Orbitron'] text-4xl font-extrabold uppercase tracking-wide text-white sm:text-6xl">
+            CODE PARADOX
+          </h1>
 
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
-              {EVENT_SPECS.map((item) => (
-                <div key={item.label}>
-                  <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[11px] tracking-[0.2em] text-[#8E829E]">
-                    <item.icon size={13} className="text-[#AF69FF]" />
-                    <span>{item.label}</span>
-                  </div>
+          <p className="max-w-2xl text-base text-[#D4CEDE] sm:text-lg">
+            Bridging the foundational era of computing and modern algorithmic optimization.
+          </p>
+        </div>
+      </section>
 
-                  <p className="text-sm font-semibold text-white sm:text-base">
-                    {item.value}
-                  </p>
+      {/* Overlapping 6-column metadata bar */}
+      <div className="relative z-10 mx-auto -mt-14 w-full max-w-6xl px-6 sm:px-10">
+        <div className="relative rounded-2xl border border-white/10 bg-[#0D0A14] py-5">
+          <span
+            className="pointer-events-none absolute top-2.5 left-2.5 h-3 w-3 border-t border-l border-[#AF69FF]/75"
+            aria-hidden="true"
+          />
+          <span
+            className="pointer-events-none absolute right-2.5 bottom-2.5 h-3 w-3 border-r border-b border-[#AF69FF]/75"
+            aria-hidden="true"
+          />
+
+          <div className="grid grid-cols-2 divide-y divide-white/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:grid-cols-6">
+            {EVENT_SPECS.map((item) => (
+              <div key={item.label} className="px-6 py-3 sm:py-1">
+                <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[11px] tracking-[0.2em] text-[#8E829E]">
+                  <item.icon size={13} className="text-[#AF69FF]" />
+                  <span>{item.label}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
+                <p
+                  className={`text-sm font-semibold sm:text-base ${
+                    item.label === "PRIZE"
+                      ? "font-['Orbitron'] text-[#D9B8FF]"
+                      : "text-white"
+                  }`}
+                >
+                  {item.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Main page sections */}
+      <div className="mx-auto w-full max-w-6xl flex-1 px-6 pt-16 pb-20 sm:px-10">
         {/* Event overview */}
         <section className="mb-16">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-6">
@@ -218,7 +185,7 @@ export default function CodeParadox() {
               </h2>
             </div>
 
-            <span className="rounded-full border border-[#AF69FF]/45 bg-[#AF69FF]/10 px-4 py-1.5 font-mono text-[11px] tracking-[0.2em] text-[#D9B8FF]">
+            <span className="rounded-full border border-[#AF69FF]/40 bg-[#AF69FF]/10 px-4 py-1.5 font-mono text-[11px] tracking-[0.2em] text-[#D9B8FF]">
               TEAM OF 2
             </span>
           </div>
@@ -246,7 +213,7 @@ export default function CodeParadox() {
             {ROUNDS.map((round) => (
               <div
                 key={round.title}
-                className="rounded-2xl border border-[#AF69FF]/25 bg-[#12091F] p-6"
+                className="rounded-2xl border border-white/10 bg-[#0F0B17] p-6"
               >
                 <p className="mb-2 font-mono text-xs tracking-[0.2em] text-[#AF69FF]">
                   {round.step}
@@ -262,7 +229,7 @@ export default function CodeParadox() {
           </div>
         </section>
 
-        {/* Rules and guidelines with numbering */}
+        {/* Rules and guidelines */}
         <section className="mb-14">
           <h3 className="mb-6 flex items-center gap-2.5 font-['Orbitron'] text-sm font-bold tracking-[0.2em] text-white">
             <span className="inline-block h-4 w-[3px] rounded-full bg-[#AF69FF]" />
@@ -273,7 +240,7 @@ export default function CodeParadox() {
             {RULES.map((rule, index) => (
               <div
                 key={rule.label}
-                className="flex items-start gap-4 rounded-xl border border-white/10 bg-[#110B1C] p-5 transition hover:border-[#AF69FF]/35"
+                className="flex items-start gap-4 rounded-xl border border-white/10 bg-[#0F0B17] p-5"
               >
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#AF69FF]/35 bg-[#AF69FF]/10 font-mono text-xs font-bold text-[#D9B8FF]">
                   {String(index + 1).padStart(2, "0")}
@@ -292,7 +259,7 @@ export default function CodeParadox() {
           </div>
         </section>
 
-        {/* Simple registration button with placeholder link */}
+        {/* Registration button */}
         <div>
           <a
             href={REGISTER_LINK}
@@ -304,22 +271,7 @@ export default function CodeParadox() {
         </div>
       </div>
 
-      {/* Bottom strip matching reference screenshot */}
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-7 sm:px-10">
-          <Link
-            to="/home#events"
-            className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.22em] text-[#8E829E] transition hover:text-[#D9B8FF]"
-          >
-            <ArrowLeft size={14} className="text-[#AF69FF]" />
-            BACK TO ALL EVENTS
-          </Link>
-
-          <p className="font-mono text-[11px] tracking-[0.24em] text-[#6E647D]">
-            © 2026 TECH CLUB · FIESTRON 2026
-          </p>
-        </div>
-      </div>
+      <EventDetailsFooter />
     </main>
   );
 }
