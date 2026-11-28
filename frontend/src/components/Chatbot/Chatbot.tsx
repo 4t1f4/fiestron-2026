@@ -14,6 +14,9 @@ interface Message {
   content: string;
 }
 
+const CHAT_API_URL =
+  import.meta.env.VITE_CHAT_API_URL || "/api/chat";
+
 const SUGGESTED_QUESTIONS = [
   "What is Fiestron?",
   "What is this year's theme?",
@@ -62,7 +65,7 @@ export default function Chatbot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(CHAT_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
