@@ -29,6 +29,7 @@ import Faq from "./sections/Faq/Faq.tsx";
 // Pages
 import Council from "./pages/Council/Council.tsx";
 import Message from "./pages/Message/Message.tsx";
+import CLRegistration from "./pages/CLRegistration/CLRegistration.tsx";
 
 // Event Details
 import CodeParadox from "./pages/EventDetails/CodeParadox";
@@ -116,13 +117,21 @@ export default function App() {
           path="/events/code-paradox"
           element={
             <>
-              {/* <Navbar /> */}
               <CodeParadox />
               
             </>
           }
         />
 
+        {/* CL Registration */}
+        <Route
+          path="/cl-registration"
+          element={
+            <>
+              <CLRegistration />
+            </>
+          }
+        />
 
 
 

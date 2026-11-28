@@ -10,6 +10,11 @@ const navItems = [
   { label: "TIMELINE", href: "#timeline", id: "timeline" },
   { label: "SPONSORS", href: "#sponsors", id: "sponsors" },
   { label: "FAQ", href: "#faq", id: "faq" },
+  {
+    label: "CL REGISTRATION",
+    href: "/cl-registration",
+    id: "cl-registration",
+  },
 ];
 
 export default function Navbar() {
@@ -110,10 +115,10 @@ export default function Navbar() {
         <nav className={`navbar-links ${menuOpen ? "show" : ""}`}>
           {navItems.map((item) => {
             const isActive =
-              item.id === "council"
-                ? currentPath === "/council"
-                : currentPath === "/home" &&
-                  activeSection === item.id;
+  item.id === "council" || item.id === "cl-registration"
+    ? currentPath === item.href
+    : currentPath === "/home" &&
+      activeSection === item.id;
 
             const destination = item.href.startsWith("#")
               ? currentPath === "/home"
@@ -132,6 +137,9 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+
+          
 
           {/* Registration button */}
           <button
